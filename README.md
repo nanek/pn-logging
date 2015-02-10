@@ -21,7 +21,7 @@ logging: {
       Loggly: {
         level: 'warning',
         json: true,
-        tag: 'pn-processing',
+        tag: 'APP_NAME',
         subdomain: process.env.LOGGLY_SUBDOMAIN,
         token: process.env.LOGGLY_TOKEN
       }
