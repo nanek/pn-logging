@@ -35,7 +35,16 @@ logging: {
 ```js
 var logging = require('pn-logging');
 logging.error(err.message, err);
-logging.info('Server started');
+logging.info('Server started.',
+             {type: 'server'});
+
+// Ad hoc logs.
+var log = new logging.Log();
+log.addMeta({
+  complaintId: complaint.id,
+  projectId: complaint.projectId
+});
+log.info('Processed complaint.');
 
 // Or as middleware.
 app.use(logging.Log.middleware());
