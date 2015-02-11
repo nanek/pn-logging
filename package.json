@@ -1,5 +1,6 @@
 {
   "name": "pn-logging",
+  "version": "1.0.0",
   "description": "A common logging interface for pn projects.",
   "private": true,
   "main": "index.js",
@@ -26,6 +27,5 @@
   },
   "devDependencies": {
     "eslint": "0.14.1"
-  },
-  "version": "1.0.0"
+  }
 }
