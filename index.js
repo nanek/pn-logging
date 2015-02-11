@@ -48,7 +48,6 @@ var logTransports = config.transports.map(function(t) {
   return new Transport(opts);
 });
 
-
 var winstonOpts = {
   levels: sysLogLevels.levels,
   transports: logTransports
