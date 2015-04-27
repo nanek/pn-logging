@@ -1,8 +1,7 @@
 {
-  "name": "pn-logging",
+  "name": "@spanishdict/pn-logging",
   "version": "1.0.0",
   "description": "A common logging interface for pn projects.",
-  "private": true,
   "main": "index.js",
   "scripts": {
     "test": "eslint *.js"
