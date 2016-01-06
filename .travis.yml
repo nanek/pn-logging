@@ -4,4 +4,4 @@ node_js:
 branches:
   only:
     - master
-script: "npm test"
+script: "npm run check"

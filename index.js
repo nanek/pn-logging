@@ -1,4 +1,7 @@
+/*eslint no-process-env:0 no-param-reassign:0*/
+
 'use strict';
+
 var util = require('util');
 var winston = require('winston');
 var winex = require('winex');
