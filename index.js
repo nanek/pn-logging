@@ -7,19 +7,16 @@ var winston = require('winston');
 var winex = require('winex');
 var config = require('config').get('logging');
 
-// winston syslog levels are in reverse. Therefore setup custom levels.
-// See https://github.com/flatiron/winston/issues/307
-//
 var sysLogLevels = {
   levels: {
-    emerg: 7,
-    alert: 6,
-    crit: 5,
-    error: 4,
-    warning: 3,
-    notice: 2,
-    info: 1,
-    debug: 0
+    emerg: 0,
+    alert: 1,
+    crit: 2,
+    error: 3,
+    warning: 4,
+    notice: 5,
+    info: 6,
+    debug: 7
   }
 };
 
