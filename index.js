@@ -5,7 +5,6 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('winex');
-var config = require('config').get('logging');
 
 var sysLogLevels = {
   levels: {
@@ -20,46 +19,71 @@ var sysLogLevels = {
   }
 };
 
+var loggingModule = {
+  Log: null,
+};
+
 // Transports are defined in configs as:
 //
 // logging: {
-//   transports: [
-//     {
-//       Console: {
-//         level: 'info',
-//         json: true,
-//         prettyPrint: true
-//       }
-//     },
-//     {
-//       ...
-//     }
-//   ]
+//   transports:
 // }
 //
-var logTransports = config.transports.map(function(t) {
-  var cls = Object.keys(t)[0];
-  var opts = t[cls];
-  var Transport;
-  if (cls === 'Loggly') {
-    require('winston-loggly');
+
+/**
+ * Setup loggings
+ *
+ * @param {Object}   options            Options
+ * @param {Object[]} options.transports Should look like:
+ *                                      [
+ *                                        {
+ *                                          Console: {
+ *                                            level: 'info',
+ *                                            json: true,
+ *                                            prettyPrint: true
+ *                                          }
+ *                                        },
+ *                                        {
+ *                                          ...
+ *                                        }
+ *                                      ]
+ *
+ * @return {void}
+ */
+loggingModule.config = function (options) {
+  var logTransports;
+  var winstonOpts;
+  var winstonLog;
+  var doNop;
+
+  if (loggingModule.Log) {
+    throw new Error('config cannot be called twice');
   }
-  Transport = winston.transports[cls];
-  return new Transport(opts);
-});
 
-var winstonOpts = {
-  levels: sysLogLevels.levels,
-  transports: logTransports
+  logTransports = options.transports.map(function(t) {
+    var cls = Object.keys(t)[0];
+    var opts = t[cls];
+    var Transport;
+    if (cls === 'Loggly') {
+      require('winston-loggly');
+    }
+    Transport = winston.transports[cls];
+    return new Transport(opts);
+  });
+
+  winstonOpts = {
+    levels: sysLogLevels.levels,
+    transports: logTransports
+  };
+
+  winstonLog = new winston.Logger(winstonOpts);
+  doNop = {nop: !!(process.env.NODE_ENV === 'test')};
+  loggingModule.Log = winex.factory(winstonLog, {}, doNop);
 };
-
-var winstonLog = new winston.Logger(winstonOpts);
-var doNop = {nop: !!(process.env.NODE_ENV === 'test')};
-var Log = winex.factory(winstonLog, {}, doNop);
 
 function _logger(level) {
   return function(message, meta, error) {
-    var log = new Log();
+    var log = new loggingModule.Log();
 
     if (util.isError(meta)) {
       error = meta;
@@ -78,10 +102,8 @@ function _logger(level) {
   };
 }
 
-module.exports = {
-  Log: Log
-};
-
-Object.keys(winstonOpts.levels).forEach(function (level) {
-  module.exports[level] = _logger(level);
+Object.keys(sysLogLevels.levels).forEach(function (level) {
+  loggingModule[level] = _logger(level);
 });
+
+module.exports = loggingModule;
