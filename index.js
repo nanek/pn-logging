@@ -23,13 +23,6 @@ var loggingModule = {
   Log: null,
 };
 
-// Transports are defined in configs as:
-//
-// logging: {
-//   transports:
-// }
-//
-
 /**
  * Setup loggings
  *
