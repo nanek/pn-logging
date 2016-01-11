@@ -2,7 +2,7 @@
 
 'use strict';
 
-var proxyquire = require('proxyquire');
+var proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var winston = require('winston');
