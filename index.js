@@ -5,6 +5,9 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('winex');
+var raven = require('raven');
+var omit = require('lodash/object/omit');
+
 var sysLogLevels;
 
 // Exposes `winston.transports.Loggly`.
@@ -47,6 +50,15 @@ sysLogLevels = {
  *                                          ...
  *                                        }
  *                                      ]
+ * @param {Object} options.sentry Config passed to sentry raven instance.
+ *                                Should look like:
+ *                                {
+ *                                  // the account token
+ *                                  dsn: string;
+ *                                  // pass directly to raven constructor
+ *                                  // refer to https://goo.gl/9Ud7Mz
+ *                                  options: Object;
+ *                                }
  *
  * @return {void}
  */
@@ -77,6 +89,9 @@ function Log(options) {
   doNop = {nop: !!(process.env.NODE_ENV === 'test')};
   this._winexConstructor = winex.factory(winstonLog, {}, doNop);
   this.middleware = this._winexConstructor.middleware;
+
+  this.ravenClient =
+    new raven.Client(options.sentry.dsn, options.sentry.options);
 }
 
 /**
@@ -100,10 +115,34 @@ function _logger(level) {
     }
 
     if (error) {
+      this.ravenClient.captureException(error, _getSentryMeta(meta));
       log.addError(error);
     }
 
     log[level](message);
+  };
+}
+
+function _getSentryMeta(meta) {
+  var tags;
+  var fingerprint;
+  var level;
+  var extra;
+
+  if (!meta) {
+    return null;
+  }
+
+  tags = meta.tags;
+  fingerprint = meta.fingerprint;
+  level = meta.level;
+  extra = omit(meta, ['tags', 'fingerprint', 'level']);
+
+  return {
+    extra: extra,
+    tags: tags,
+    fingerprint: fingerprint,
+    level: level
   };
 }
 
@@ -113,4 +152,5 @@ Object.keys(sysLogLevels.levels).forEach(function (level) {
 
 module.exports = {
   Log: Log,
+  _getSentryMeta: _getSentryMeta
 };
