@@ -124,6 +124,15 @@ describe('index', function () {
       expect(args[2]).to.have.property('errStack');
     });
 
+    it('should log error as the second arg', function () {
+      log.error('oops', new Error('dangit'));
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('errMsg', 'dangit');
+      expect(args[2]).to.have.property('errStack');
+    });
+
     it('should log metadata', function () {
       log.debug('hi', { name: 'Dan' });
 
