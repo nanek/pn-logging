@@ -1,241 +1,165 @@
-/*eslint no-process-env:0*/
+/*eslint vars-on-top:0*/
 
 'use strict';
 
-var proxyquire = require('proxyquire');
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var winston = require('winston');
 var TestTransport = require('./mock/test-transport');
+var index = require('../index');
 
-describe('config', function () {
+describe('index', function () {
 
-  var subjectModule;
-  var subjectFunc;
-
-  beforeEach(function () {
-    subjectModule = proxyquire('../index', {});
-    subjectFunc = subjectModule.config;
-  });
-
-  it('should assign `Log` export', function () {
-    expect(subjectModule.Log).null;
-
-    subjectFunc({transports: []});
-
-    expect(subjectModule.Log).not.null;
-  });
-
-  it('should throw error if called twice', function () {
-    subjectFunc({transports: []});
-
-    function run() {
-      subjectFunc();
-    }
-
-    expect(run).throw('config cannot be called twice');
-  });
-
-  it('should require winston-loggly if Loggly opts is provided', function () {
-    var theWinston = proxyquire('winston', {});
-    var theModule;
-
-    expect(theWinston.transports).not.property('Loggly');
-
-    theModule = proxyquire('../index', {
-      winston: theWinston
-    });
-
-    theModule.config({transports: [
-      {
-        Loggly: {
-          subdomain: 'a loggly domain',
-          token: 'a token'
-        }
-      }
-    ]});
-
-    expect(theWinston.transports).property('Loggly');
-  });
-
-});
-
-describe('Log', function () {
-
-  var subjectModule;
-  var Log;
-  var tmpEnv;
-  var __log;
-
-  winston.transports.TestTransport = TestTransport;
+  var sandbox;
 
   beforeEach(function () {
-    tmpEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-    subjectModule = proxyquire('../index', {
-      winston: winston
-    });
-    __log = sinon.stub();
-    subjectModule.config({transports: [
-      {
-        TestTransport: {
-          level: 'debug',
-          __log: __log
-        }
-      }
-    ]});
-    Log = subjectModule.Log;
+    sandbox = sinon.sandbox.create();
   });
 
   afterEach(function () {
-    process.env.NODE_ENV = tmpEnv;
+    sandbox.restore();
   });
 
-  it('should log message', function () {
-    var log = new Log();
+  describe('Log constructor', function () {
 
-    log.info('message');
+    it('should return a Log instance', function () {
+      var log = new index.Log({ transports: [] });
 
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      'info',
-      'message',
-      sinon.match.any);
-  });
-
-  it('should log meta', function () {
-    var log = new Log();
-
-    log.info('message', {type: 'meta'});
-
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      sinon.match.any,
-      sinon.match.any,
-      sinon.match.has('type', 'meta'));
-  });
-
-});
-
-describe('info', function () {
-
-  var subjectModule;
-  var subjectFunc;
-  var tmpEnv;
-  var __log;
-
-  winston.transports.TestTransport = TestTransport;
-
-  beforeEach(function () {
-    tmpEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-    subjectModule = proxyquire('../index', {
-      winston: winston
+      expect(log).to.be.an.instanceOf(index.Log);
     });
-    __log = sinon.stub();
-    subjectModule.config({transports: [
-      {
-        TestTransport: {
-          level: 'debug',
-          __log: __log
-        }
+
+    it('should complain if no transports provided', function () {
+      function tryMakeBadLog() {
+        return new index.Log();
       }
-    ]});
-    subjectFunc = subjectModule.info;
-  });
-
-  afterEach(function () {
-    process.env.NODE_ENV = tmpEnv;
-  });
-
-  it('should log message', function () {
-    subjectFunc('message');
-
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      'info',
-      'message',
-      sinon.match.any);
-  });
-
-  it('should log meta', function () {
-    subjectFunc('message', {type: 'meta'});
-
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      sinon.match.any,
-      sinon.match.any,
-      sinon.match.has('type', 'meta'));
-  });
-
-});
-
-describe('error', function () {
-
-  var subjectModule;
-  var subjectFunc;
-  var tmpEnv;
-  var __log;
-
-  winston.transports.TestTransport = TestTransport;
-
-  beforeEach(function () {
-    tmpEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-    subjectModule = proxyquire('../index', {
-      winston: winston
+      expect(tryMakeBadLog).to.throw(/No transports found/);
     });
-    __log = sinon.stub();
-    subjectModule.config({transports: [
-      {
-        TestTransport: {
-          level: 'debug',
-          __log: __log
-        }
-      }
-    ]});
-    subjectFunc = subjectModule.error;
+
+    it('should have a debug method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('debug');
+    });
+
+    it('should have a info method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('info');
+    });
+
+    it('should have a notice method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('notice');
+    });
+
+    it('should have a warning method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('warning');
+    });
+
+    it('should have a error method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('error');
+    });
+
+    it('should have a crit method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('crit');
+    });
+
+    it('should have a alert method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('alert');
+    });
+
+    it('should have a emerg method', function () {
+      var log = new index.Log({ transports: [] });
+
+      expect(log).to.respondTo('emerg');
+    });
+
+    it('should support winston-loggly', function () {
+      expect(winston.transports).to.have.property('Loggly');
+    });
+
   });
 
-  afterEach(function () {
-    process.env.NODE_ENV = tmpEnv;
+  describe('log methods', function () {
+
+    var log;
+    var spy;
+
+    beforeEach(function () {
+      sandbox.stub(winston, 'transports', { TestTransport: TestTransport });
+
+      spy = sinon.spy();
+      log = new index.Log({
+        transports: [{
+          TestTransport: {
+            level: 'debug',
+            __log: spy
+          }
+        }]
+      });
+    });
+
+    it('should log a message', function () {
+      log.debug('say what?');
+
+      sinon.assert.calledOnce(spy);
+      sinon.assert.calledWith(spy, 'debug', 'say what?');
+    });
+
+    it('should log error properties', function () {
+      log.error('oops', {}, new Error('dangit'));
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('errMsg', 'dangit');
+      expect(args[2]).to.have.property('errStack');
+    });
+
+    it('should log error as the second arg', function () {
+      log.error('oops', new Error('dangit'));
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('errMsg', 'dangit');
+      expect(args[2]).to.have.property('errStack');
+    });
+
+    it('should log metadata', function () {
+      log.debug('hi', { name: 'Dan' });
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('name', 'Dan');
+    });
+
   });
 
-  it('should log error message', function () {
-    subjectFunc('message');
+  describe('middleware', function () {
 
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      'error',
-      'message',
-      sinon.match.any);
-  });
+    it('should have middleware on the instance', function () {
+      var log = new index.Log({ transports: [] });
 
-  it('should log meta', function () {
-    subjectFunc('message', {type: 'meta'});
+      expect(log).to.have.property('middleware');
+      expect(log.middleware).to.be.a('function');
+    });
 
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      sinon.match.any,
-      sinon.match.any,
-      sinon.match.has('type', 'meta'));
-  });
+    it('should produce a middleware function', function () {
+      var log = new index.Log({ transports: [] });
+      var middleware = log.middleware();
 
-  it('should log error', function () {
-    subjectFunc('message', new Error('an error'));
+      expect(middleware).to.be.a('function');
+      expect(middleware).to.have.length(3);
+    });
 
-    sinon.assert.calledOnce(__log);
-    sinon.assert.alwaysCalledWithMatch(
-      __log,
-      sinon.match.any,
-      sinon.match.any,
-      sinon.match.has('errMsg', 'an error'));
   });
 
 });
