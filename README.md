@@ -18,11 +18,6 @@ logger.error('Error message', meta, err);
 
 // Use Express middleware
 app.use(logger.middleware());
-
-// Use constructor
-var log = new logger._winexConstructor();
-log.addMeta(meta);
-log.info('Message');
 ```
 
 ### Config
