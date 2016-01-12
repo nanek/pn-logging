@@ -5,8 +5,12 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('winex');
+var sysLogLevels;
 
-var sysLogLevels = {
+// Exposes `winston.transports.Loggly`.
+require('winston-loggly');
+
+sysLogLevels = {
   levels: {
     emerg: 0,
     alert: 1,
@@ -19,12 +23,15 @@ var sysLogLevels = {
   }
 };
 
-var loggingModule = {
-  Log: null,
-};
-
 /**
- * Setup loggings
+ * Create a log object for public consumption.
+ *
+ * Usage:
+ *
+ * l = new Log(options);
+ * l.info('blah', {});
+ * l.error('oops', {}, err);
+ * app.use(l.middleware());
  *
  * @param {Object}   options            Options
  * @param {Object[]} options.transports Should look like:
@@ -43,24 +50,20 @@ var loggingModule = {
  *
  * @return {void}
  */
-loggingModule.config = function (options) {
+function Log(options) {
   var logTransports;
   var winstonOpts;
   var winstonLog;
   var doNop;
 
-  if (loggingModule.Log) {
-    throw new Error('config cannot be called twice');
+  if (!options || !options.transports) {
+    throw new Error('No transports found');
   }
 
   logTransports = options.transports.map(function(t) {
     var cls = Object.keys(t)[0];
     var opts = t[cls];
-    var Transport;
-    if (cls === 'Loggly') {
-      require('winston-loggly');
-    }
-    Transport = winston.transports[cls];
+    var Transport = winston.transports[cls];
     return new Transport(opts);
   });
 
@@ -70,13 +73,22 @@ loggingModule.config = function (options) {
   };
 
   winstonLog = new winston.Logger(winstonOpts);
+  // Possibly put this in config instead of reading process.env.
   doNop = {nop: !!(process.env.NODE_ENV === 'test')};
-  loggingModule.Log = winex.factory(winstonLog, {}, doNop);
-};
+  this._winexConstructor = winex.factory(winstonLog, {}, doNop);
+  this.middleware = this._winexConstructor.middleware;
+}
 
+/**
+ * Helper function for attaching methods to the logger prototype.
+ *
+ * @param {string} level  Logging level, e.g. 'debug'.
+ *
+ * @return {Function} Logging method to attach to the Log prototype.
+ */
 function _logger(level) {
   return function(message, meta, error) {
-    var log = new loggingModule.Log();
+    var log = new (this._winexConstructor)();
 
     if (util.isError(meta)) {
       error = meta;
@@ -96,7 +108,9 @@ function _logger(level) {
 }
 
 Object.keys(sysLogLevels.levels).forEach(function (level) {
-  loggingModule[level] = _logger(level);
+  Log.prototype[level] = _logger(level);
 });
 
-module.exports = loggingModule;
+module.exports = {
+  Log: Log,
+};
