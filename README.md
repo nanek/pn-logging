@@ -2,13 +2,35 @@
 
 A common logging interface for pn projects.
 
-## Config
-
-Requires the `config` library, with the project's config files containing a key
-with the log transports like so:
+## Usage
 
 ```js
-logging: {
+var Log = require('@spanishdict/pn-logging').Log;
+
+var logger = new Log(config);
+
+// Call methods
+logger.info('Message', meta);
+
+logger.error('Error message', err);
+// or
+logger.error('Error message', meta, err);
+
+// Use Express middleware
+app.use(logger.middleware());
+
+// Use constructor
+var log = new logger._winexConstructor();
+log.addMeta(meta);
+log.info('Message');
+```
+
+### Config
+
+The `config` object passed to `Log` constructor should look like:
+
+```js
+var config = {
   transports: [
     {
       Console: {
@@ -27,25 +49,5 @@ logging: {
       }
     }
   ]
-}
-```
-
-## Usage
-
-```js
-var logging = require('pn-logging');
-logging.error(err.message, err);
-logging.info('Server started.',
-             {type: 'server'});
-
-// Ad hoc logs.
-var log = new logging.Log();
-log.addMeta({
-  complaintId: complaint.id,
-  projectId: complaint.projectId
-});
-log.info('Processed complaint.');
-
-// Or as middleware.
-app.use(logging.Log.middleware());
+};
 ```

@@ -4,15 +4,17 @@
   "description": "A common logging interface for pn projects.",
   "main": "index.js",
   "scripts": {
-    "style": "eslint index.js",
-    "check": "npm run style"
+    "style": "eslint index.js test",
+    "test": "istanbul cover node_modules/.bin/_mocha -- --recursive test",
+    "check": "npm run style && npm test",
+    "watch:test": "mocha -w --recursive test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/spanishdict/pn-logging.git"
   },
   "author": "Daniel Paz-Soldan <daniel.pazsoldan@gmail.com>",
-  "license": "All Rights Reserved",
+  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/spanishdict/pn-logging/issues"
   },
@@ -22,10 +24,12 @@
     "winston": "2.1.1",
     "winston-loggly": "1.2.0"
   },
-  "peerDependencies": {
-    "config": "1.10.0"
-  },
   "devDependencies": {
-    "eslint": "1.9.0"
+    "chai": "3.4.1",
+    "eslint": "1.9.0",
+    "istanbul": "0.4.1",
+    "mocha": "2.3.4",
+    "proxyquire": "1.7.3",
+    "sinon": "1.17.2"
   }
 }
