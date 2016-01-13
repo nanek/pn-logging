@@ -90,8 +90,13 @@ function Log(options) {
   this._winexConstructor = winex.factory(winstonLog, {}, doNop);
   this.middleware = this._winexConstructor.middleware;
 
-  this.ravenClient =
-    new raven.Client(options.sentry.dsn, options.sentry.options);
+  if (sentry) {
+    this.ravenClient = new raven.Client(
+      options.sentry.dsn,
+      options.sentry.options);
+  } else {
+    this.ravenClient = new raven.Client(false);
+  }
 }
 
 /**
