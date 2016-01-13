@@ -67,7 +67,6 @@ function Log(options) {
   var logTransports;
   var winstonOpts;
   var winstonLog;
-  var doNop;
 
   if (!options || !options.transports) {
     throw new Error('No transports found');

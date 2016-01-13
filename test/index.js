@@ -283,7 +283,7 @@ describe('index', function () {
         }
       };
 
-      var result = index._getSentryMeta(input);
+      index._getSentryMeta(input);
 
       expect(input).to.eql({
         tags: {
