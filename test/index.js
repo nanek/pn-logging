@@ -198,7 +198,7 @@ describe('index', function () {
       expect(result).to.have.property('fingerprint', 'fingerprintValue');
     });
 
-    it('should add fingerprint property', function () {
+    it('should add level property', function () {
       var input = {
         level: 'error'
       };
