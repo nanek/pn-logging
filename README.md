@@ -48,7 +48,8 @@ var config = {
       Console: {
         level: 'info',
         json: true,
-        prettyPrint: true
+        prettyPrint: true,
+        silent: true // for test
       }
     },
     {
