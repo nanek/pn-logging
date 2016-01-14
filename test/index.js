@@ -182,10 +182,8 @@ describe('index', function () {
       var result = index._getSentryMeta(input);
 
       expect(result).to.have.property('tags');
-      expect(result.tags).to.eql({
-        key1: 'value1',
-        key2: 'value2'
-      });
+      expect(result.tags).to.have.property('key1', 'value1');
+      expect(result.tags).to.have.property('key2', 'value2');
     });
 
     it('should add fingerprint property', function () {
@@ -239,6 +237,60 @@ describe('index', function () {
       expect(result).to.have.property('extra');
       expect(result.extra).to.have.property('key1', 'value1');
       expect(result.extra).to.have.property('key2', 'value2');
+    });
+
+    it('should add tags if no tags are defined', function () {
+      var input = {};
+
+      var result = index._getSentryMeta(input);
+
+      expect(result).to.have.property('extra');
+      expect(result.tags).to.have.property('env', 'test');
+    });
+
+    it('should add env to tags if no env is defined', function () {
+      var input = {
+        tags: {
+          key1: 'value1',
+          key2: 'value2'
+        }
+      };
+
+      var result = index._getSentryMeta(input);
+
+      expect(result.tags).to.have.property('env', 'test');
+    });
+
+    it('should not change env in tags if env is defined', function () {
+      var input = {
+        tags: {
+          key1: 'value1',
+          key2: 'value2',
+          env: 'production'
+        }
+      };
+
+      var result = index._getSentryMeta(input);
+
+      expect(result.tags).to.have.property('env', 'production');
+    });
+
+    it('should not mutate input', function () {
+      var input = {
+        tags: {
+          key1: 'value1',
+          key2: 'value2'
+        }
+      };
+
+      index._getSentryMeta(input);
+
+      expect(input).to.eql({
+        tags: {
+          key1: 'value1',
+          key2: 'value2'
+        }
+      });
     });
 
   });

@@ -7,6 +7,7 @@ var winston = require('winston');
 var winex = require('winex');
 var raven = require('raven');
 var omit = require('lodash/object/omit');
+var assign = require('lodash/object/assign');
 
 var sysLogLevels;
 
@@ -66,7 +67,6 @@ function Log(options) {
   var logTransports;
   var winstonOpts;
   var winstonLog;
-  var doNop;
 
   if (!options || !options.transports) {
     throw new Error('No transports found');
@@ -85,9 +85,7 @@ function Log(options) {
   };
 
   winstonLog = new winston.Logger(winstonOpts);
-  // Possibly put this in config instead of reading process.env.
-  doNop = {nop: !!(process.env.NODE_ENV === 'test')};
-  this._winexConstructor = winex.factory(winstonLog, {}, doNop);
+  this._winexConstructor = winex.factory(winstonLog, {});
   this.middleware = this._winexConstructor.middleware;
 
   if (options.sentry) {
@@ -138,7 +136,20 @@ function _getSentryMeta(meta) {
     return null;
   }
 
-  tags = meta.tags;
+  if (!meta.tags) {
+    tags = {
+      env: process.env.NODE_ENV || 'development'
+    };
+  } else {
+    tags = meta.tags;
+
+    if (tags.env == null) {
+      tags = assign({}, tags, {
+        env: process.env.NODE_ENV || 'development'
+      });
+    }
+  }
+
   fingerprint = meta.fingerprint;
   level = meta.level;
   extra = omit(meta, ['tags', 'fingerprint', 'level']);
