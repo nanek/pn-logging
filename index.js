@@ -7,7 +7,7 @@ var winston = require('winston');
 var winex = require('winex');
 var raven = require('raven');
 var omit = require('lodash/object/omit');
-var assign = require('lodash/object/assign');
+var merge = require('lodash/object/merge');
 
 var sysLogLevels;
 
@@ -126,40 +126,32 @@ function _logger(level) {
   };
 }
 
+/**
+ * Format log meta to sentry optional attribute. See:
+ * https://docs.getsentry.com/hosted/clients/node/usage/#optional-attributes
+ *
+ * @param {Object} [meta] Meta data passed to logger
+ *
+ * @return {Object} Optional attributes for sentry. Default will look like:
+ *                  {
+ *                    tags: {
+ *                      env: 'development'
+ *                    }
+ *                  }
+ */
 function _getSentryMeta(meta) {
-  var tags;
-  var fingerprint;
-  var level;
-  var extra;
+  var _meta = meta || {};
 
-  if (!meta) {
-    return null;
-  }
-
-  if (!meta.tags) {
-    tags = {
+  return merge({
+    tags: {
       env: process.env.NODE_ENV || 'development'
-    };
-  } else {
-    tags = meta.tags;
-
-    if (tags.env == null) {
-      tags = assign({}, tags, {
-        env: process.env.NODE_ENV || 'development'
-      });
     }
-  }
-
-  fingerprint = meta.fingerprint;
-  level = meta.level;
-  extra = omit(meta, ['tags', 'fingerprint', 'level']);
-
-  return {
-    extra: extra,
-    tags: tags,
-    fingerprint: fingerprint,
-    level: level
-  };
+  }, {
+    extra: omit(_meta, ['tags', 'fingerprint', 'level']),
+    tags: _meta.tags,
+    fingerprint: _meta.fingerprint,
+    level: _meta.level,
+  });
 }
 
 Object.keys(sysLogLevels.levels).forEach(function (level) {
