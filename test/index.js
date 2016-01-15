@@ -169,6 +169,7 @@ describe('index', function () {
       var result = index._getSentryMeta();
 
       expect(result).to.be.eql({
+        extra: {},
         tags: {
           env: 'test'
         }
