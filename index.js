@@ -126,6 +126,19 @@ function _logger(level) {
   };
 }
 
+/**
+ * Format log meta to sentry optional attribute. See:
+ * https://docs.getsentry.com/hosted/clients/node/usage/#optional-attributes
+ *
+ * @param {Object} [meta] Meta data passed to logger
+ *
+ * @return {Object} Optional attributes for sentry. Default will look like:
+ *                  {
+ *                    tags: {
+ *                      env: 'development'
+ *                    }
+ *                  }
+ */
 function _getSentryMeta(meta) {
   var _meta = meta || {};
 
