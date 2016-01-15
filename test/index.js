@@ -165,10 +165,14 @@ describe('index', function () {
 
   describe('_getSentryMeta', function () {
 
-    it('should return null if meta is not defined', function () {
+    it('should return just tags if meta is not defined', function () {
       var result = index._getSentryMeta();
 
-      expect(result).to.be.null;
+      expect(result).to.be.eql({
+        tags: {
+          env: 'test'
+        }
+      });
     });
 
     it('should add tags property', function () {

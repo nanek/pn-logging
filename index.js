@@ -133,7 +133,11 @@ function _getSentryMeta(meta) {
   var extra;
 
   if (!meta) {
-    return null;
+    return {
+      tags: {
+        env: process.env.NODE_ENV || 'development'
+      }
+    };
   }
 
   if (!meta.tags) {
