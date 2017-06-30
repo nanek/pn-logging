@@ -8,7 +8,7 @@
     "url": "https://github.com/spanishdict/pn-logging.git"
   },
   "author": "Daniel Paz-Soldan <daniel.pazsoldan@gmail.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/spanishdict/pn-logging/issues"
   },
