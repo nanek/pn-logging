@@ -1,7 +1,7 @@
 {
   "name": "pn-logging",
   "version": "3.0.1",
-  "description": "A common logging interface for pn projects.",
+  "description": "A logging wrapper around winston and sentry.",
   "main": "index.js",
   "repository": {
     "type": "git",
