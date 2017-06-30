@@ -1,5 +1,5 @@
 {
-  "name": "@spanishdict/pn-logging",
+  "name": "pn-logging",
   "version": "3.0.1",
   "description": "A common logging interface for pn projects.",
   "main": "index.js",
