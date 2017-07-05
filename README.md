@@ -5,7 +5,7 @@ A logging wrapper around winston and sentry.
 ## Usage
 
 ```js
-var Log = require('@spanishdict/pn-logging').Log;
+var Log = require('pn-logging').Log;
 
 var logger = new Log(config);
 
@@ -25,7 +25,7 @@ app.use(logger.middleware());
 If error object is passed to logger's logging methods, e.g. `error`, in addition to sending data to defined transporter (most likely Loggly), the error will also be sent to Sentry.
 
 ```js
-var Log = require('@spanishdict/pn-logging').Log;
+var Log = require('pn-logging').Log;
 var logger = new Log(config);
 
 logger.error('Error message', {
