@@ -1,14 +1,13 @@
 {
-  "name": "@spanishdict/pn-logging",
+  "name": "pn-logging",
   "version": "3.0.1",
-  "description": "A common logging interface for pn projects.",
+  "description": "A logging wrapper around winston and sentry.",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/spanishdict/pn-logging.git"
   },
-  "author": "Daniel Paz-Soldan <daniel.pazsoldan@gmail.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/spanishdict/pn-logging/issues"
   },
