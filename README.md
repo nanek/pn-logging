@@ -1,6 +1,6 @@
 # pn-logging
 
-A common logging interface for pn projects.
+A logging wrapper around winston and sentry.
 
 ## Usage
 
