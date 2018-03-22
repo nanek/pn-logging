@@ -70,3 +70,24 @@ var config = {
   }
 };
 ```
+
+## Publish
+
+This library is published under the
+[pubnation](https://www.npmjs.com/~pubnation) private npm registry. Run the
+following commands to release a new version.
+
+    # Login to the cli as pubnation.
+    $ npm login
+    $ npm whoami
+
+    # Make sure you're up to date with master.
+    $ git checkout master
+    $ git pull
+
+    # Bump the version and push directly to master.
+    $ npm version <major|minor|patch>  # Bump version.
+    $ git push
+
+    # Publish.
+    $ npm publish --access restricted
