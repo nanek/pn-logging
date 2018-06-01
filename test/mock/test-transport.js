@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-var util = require('util');
-var winston = require('winston');
+const util = require("util");
+const winston = require("winston");
 
 /**
  * Transporter
@@ -12,14 +12,14 @@ var winston = require('winston');
  * @param {function} opts.__log Callback to run when logging
  */
 function TestTransport(opts) {
-  this.name = 'test';
+  this.name = "test";
   this.level = opts.level;
   this.__log = opts.__log;
 }
 
 util.inherits(TestTransport, winston.Transport);
 
-TestTransport.prototype.log = function (level, msg, meta, callback) {
+TestTransport.prototype.log = function(level, msg, meta, callback) {
   this.__log(level, msg, meta);
   callback(null, true);
 };

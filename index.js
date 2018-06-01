@@ -1,20 +1,27 @@
 /*eslint no-process-env:0 no-param-reassign:0*/
 
-'use strict';
+"use strict";
 
-var util = require('util');
-var winston = require('winston');
-var winex = require('winex');
-var raven = require('raven');
-var omit = require('lodash/object/omit');
-var merge = require('lodash/object/merge');
-
-var sysLogLevels;
+const util = require("util");
+const winston = require("winston");
+const winex = require("winex");
+const raven = require("raven");
+const omit = require("lodash/object/omit");
+const merge = require("lodash/object/merge");
+const parent = require("parent-package-json");
 
 // Exposes `winston.transports.Loggly`.
-require('winston-loggly');
+require("winston-loggly");
 
-sysLogLevels = {
+const versionOfParent = (() => {
+  try {
+    return parent(__dirname).parse().version;
+  } catch (error) {
+    return undefined;
+  }
+})();
+
+const sysLogLevels = {
   levels: {
     emerg: 0,
     alert: 1,
@@ -64,34 +71,28 @@ sysLogLevels = {
  * @return {void}
  */
 function Log(options) {
-  var logTransports;
-  var winstonOpts;
-  var winstonLog;
-
   if (!options || !options.transports) {
-    throw new Error('No transports found');
+    throw new Error("No transports found");
   }
 
-  logTransports = options.transports.map(function(t) {
-    var cls = Object.keys(t)[0];
-    var opts = t[cls];
-    var Transport = winston.transports[cls];
+  const logTransports = options.transports.map(function(t) {
+    const cls = Object.keys(t)[0];
+    const opts = t[cls];
+    const Transport = winston.transports[cls];
     return new Transport(opts);
   });
 
-  winstonOpts = {
+  const winstonOpts = {
     levels: sysLogLevels.levels,
     transports: logTransports
   };
 
-  winstonLog = new winston.Logger(winstonOpts);
+  const winstonLog = new winston.Logger(winstonOpts);
   this._winexConstructor = winex.factory(winstonLog, {});
   this.middleware = this._winexConstructor.middleware;
 
   if (options.sentry) {
-    this.ravenClient = new raven.Client(
-      options.sentry.dsn,
-      options.sentry.options);
+    this.ravenClient = new raven.Client(options.sentry.dsn, options.sentry.options);
   } else {
     this.ravenClient = new raven.Client(false);
   }
@@ -106,7 +107,7 @@ function Log(options) {
  */
 function _logger(level) {
   return function(message, meta, error) {
-    var log = new (this._winexConstructor)();
+    const log = new this._winexConstructor();
 
     if (util.isError(meta)) {
       error = meta;
@@ -115,6 +116,9 @@ function _logger(level) {
 
     if (meta) {
       log.addMeta(meta);
+      if (versionOfParent) {
+        log.addMeta({ version: versionOfParent });
+      }
     }
 
     if (error) {
@@ -140,21 +144,25 @@ function _logger(level) {
  *                  }
  */
 function _getSentryMeta(meta) {
-  var _meta = meta || {};
+  const _meta = meta || {};
 
-  return merge({
-    tags: {
-      env: process.env.NODE_ENV || 'development'
+  return merge(
+    {
+      tags: {
+        env: process.env.NODE_ENV || "development"
+      }
+    },
+    {
+      extra: omit(_meta, ["tags", "fingerprint", "level"]),
+      tags: _meta.tags,
+      fingerprint: _meta.fingerprint,
+      level: _meta.level,
+      version: versionOfParent
     }
-  }, {
-    extra: omit(_meta, ['tags', 'fingerprint', 'level']),
-    tags: _meta.tags,
-    fingerprint: _meta.fingerprint,
-    level: _meta.level,
-  });
+  );
 }
 
-Object.keys(sysLogLevels.levels).forEach(function (level) {
+Object.keys(sysLogLevels.levels).forEach(function(level) {
   Log.prototype[level] = _logger(level);
 });
 
