@@ -1,0 +1,10 @@
+.idea
+*.iml
+coverage
+test
+.editorconfig
+.eslintrc.js
+.prettierignore
+.prettierrc.json
+.travis.yml
+.npmignore
