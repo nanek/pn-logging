@@ -23,8 +23,8 @@ sysLogLevels = {
     warning: 4,
     notice: 5,
     info: 6,
-    debug: 7
-  }
+    debug: 7,
+  },
 };
 
 /**
@@ -81,7 +81,7 @@ function Log(options) {
 
   winstonOpts = {
     levels: sysLogLevels.levels,
-    transports: logTransports
+    transports: logTransports,
   };
 
   winstonLog = new winston.Logger(winstonOpts);
@@ -91,7 +91,8 @@ function Log(options) {
   if (options.sentry) {
     this.ravenClient = new raven.Client(
       options.sentry.dsn,
-      options.sentry.options);
+      options.sentry.options
+    );
   } else {
     this.ravenClient = new raven.Client(false);
   }
@@ -106,7 +107,7 @@ function Log(options) {
  */
 function _logger(level) {
   return function(message, meta, error) {
-    var log = new (this._winexConstructor)();
+    var log = new this._winexConstructor();
 
     if (util.isError(meta)) {
       error = meta;
@@ -142,23 +143,26 @@ function _logger(level) {
 function _getSentryMeta(meta) {
   var _meta = meta || {};
 
-  return merge({
-    tags: {
-      env: process.env.NODE_ENV || 'development'
+  return merge(
+    {
+      tags: {
+        env: process.env.NODE_ENV || 'development',
+      },
+    },
+    {
+      extra: omit(_meta, ['tags', 'fingerprint', 'level']),
+      tags: _meta.tags,
+      fingerprint: _meta.fingerprint,
+      level: _meta.level,
     }
-  }, {
-    extra: omit(_meta, ['tags', 'fingerprint', 'level']),
-    tags: _meta.tags,
-    fingerprint: _meta.fingerprint,
-    level: _meta.level,
-  });
+  );
 }
 
-Object.keys(sysLogLevels.levels).forEach(function (level) {
+Object.keys(sysLogLevels.levels).forEach(function(level) {
   Log.prototype[level] = _logger(level);
 });
 
 module.exports = {
   Log: Log,
-  _getSentryMeta: _getSentryMeta
+  _getSentryMeta: _getSentryMeta,
 };
