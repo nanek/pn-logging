@@ -162,11 +162,13 @@ describe('index', function() {
     it('should return just tags if meta is not defined', function() {
       var result = index._getSentryMeta();
 
-      expect(result).to.be.eql({
+      expect(result).to.deep.equal({
         extra: {},
         tags: {
           env: 'test',
         },
+        fingerprint: undefined,
+        level: undefined,
       });
     });
 

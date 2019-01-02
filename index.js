@@ -6,8 +6,7 @@ var util = require('util');
 var winston = require('winston');
 var winex = require('winex');
 var raven = require('raven');
-var omit = require('lodash/object/omit');
-var merge = require('lodash/object/merge');
+var { omit, merge } = require('lodash');
 
 var sysLogLevels;
 
