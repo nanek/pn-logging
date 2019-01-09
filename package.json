@@ -13,9 +13,9 @@
   },
   "homepage": "https://github.com/spanishdict/pn-logging",
   "dependencies": {
+    "deep-extend": "0.2.2",
     "lodash": "4.17.11",
     "raven": "0.9.0",
-    "winex": "0.0.6",
     "winston": "2.1.1",
     "winston-loggly": "1.2.0"
   },
