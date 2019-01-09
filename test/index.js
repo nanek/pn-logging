@@ -158,11 +158,11 @@ describe('index', function() {
     });
 
     function makeReq(props) {
-      return Object.assign({}, {url: 'http://example.com/path', path: '/path'}, props)
+      return Object.assign({url: 'http://example.com/path', path: '/path'}, props)
     }
 
     function makeRes(props) {
-      return Object.assign({}, {locals: {}, statusCode: 200, end: ()=>{}}, props)
+      return Object.assign({locals: {}, statusCode: 200, end: () => {}}, props)
     }
 
     it('should patch res.end and emit an info log instance for a 200 response', function(done) {
