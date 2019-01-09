@@ -4,7 +4,7 @@
 
 var util = require('util');
 var winston = require('winston');
-var winex = require('./winex');
+var winex = require('./winex-decaf');
 var raven = require('raven');
 var { omit, merge } = require('lodash');
 
