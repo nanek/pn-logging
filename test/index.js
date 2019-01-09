@@ -156,6 +156,72 @@ describe('index', function() {
       expect(middleware).to.be.a('function');
       expect(middleware).to.have.length(3);
     });
+
+    function makeReq(props) {
+      return Object.assign({}, {url: 'http://example.com/path', path: '/path'}, props)
+    }
+
+    function makeRes(props) {
+      return Object.assign({}, {locals: {}, statusCode: 200, end: ()=>{}}, props)
+    }
+
+    it('should patch res.end and emit an info log instance for a 200 response', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware();
+
+      var req = makeReq();
+      var res = makeRes();
+
+      middleware(req, res, (err) => {
+        expect(err).to.be.undefined
+        expect(res.end).to.be.a('function')
+        expect(res.locals._log).to.be.ok
+        expect(res.locals._log.info).to.be.a('function')
+        const infoStub = sinon.stub(res.locals._log, 'info')
+        res.end()
+        sinon.assert.calledOnce(infoStub)
+        done()
+      })
+    });
+
+    it('should patch res.end and emit a warning log instance for a 400 response', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware();
+
+      var req = makeReq();
+      var res = makeRes({statusCode: 400});
+
+      middleware(req, res, (err) => {
+        expect(err).to.be.undefined
+        expect(res.end).to.be.a('function')
+        expect(res.locals._log).to.be.ok
+        expect(res.locals._log.info).to.be.a('function')
+        const warningStub = sinon.stub(res.locals._log, 'warning')
+        res.end()
+        sinon.assert.calledOnce(warningStub)
+        done()
+      })
+    });
+
+    it('should patch res.end and emit an error log instance for a 500 response', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware();
+
+      var req = makeReq();
+      var res = makeRes({statusCode: 500});
+
+      middleware(req, res, (err) => {
+        expect(err).to.be.undefined
+        expect(res.end).to.be.a('function')
+        expect(res.locals._log).to.be.ok
+        expect(res.locals._log.info).to.be.a('function')
+        const errorStub = sinon.stub(res.locals._log, 'error')
+        res.end()
+        sinon.assert.calledOnce(errorStub)
+        done()
+      })
+    })    
+    
   });
 
   describe('_getSentryMeta', function() {
