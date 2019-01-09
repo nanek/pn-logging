@@ -1,3 +1,4 @@
+/*eslint no-console: 0*/
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from

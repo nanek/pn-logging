@@ -28,7 +28,7 @@
     "sinon": "1.17.2"
   },
   "scripts": {
-    "style": "eslint index.js test",
+    "style": "eslint index.js winex-decaf.js test",
     "test": "env NODE_ENV=test istanbul cover node_modules/.bin/_mocha -- --recursive test",
     "check": "npm run style && npm test",
     "watch:test": "mocha -w --recursive test"
