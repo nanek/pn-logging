@@ -186,7 +186,7 @@ describe('index', function() {
         expect(logObj.meta).to.eql( { reqPath: '/path',
                                       reqQuery: '',
                                       reqQueryChars: 0,
-                                      resStatus: 200 })
+                                      resStatus: '200' })
         done()
       })
     });
@@ -211,7 +211,7 @@ describe('index', function() {
         expect(logObj.meta).to.eql( { reqPath: '/path',
                                       reqQuery: '',
                                       reqQueryChars: 0,
-                                      resStatus: 400 })
+                                      resStatus: '400' })
         done()
       })
     });
@@ -235,7 +235,7 @@ describe('index', function() {
         expect(logObj.meta).to.eql( { reqPath: '/path',
                                       reqQuery: '',
                                       reqQueryChars: 0,
-                                      resStatus: 500 })
+                                      resStatus: '500' })
         done()
       })
     })

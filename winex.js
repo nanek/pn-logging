@@ -237,7 +237,7 @@ factory = function(winstonLogger, classMeta, opts) {
         res = {};
       }
       return this.meta = extend(this.meta, {
-        resStatus: res.statusCode
+        resStatus: res.statusCode.toString()
       });
     };
 
