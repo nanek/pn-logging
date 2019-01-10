@@ -189,7 +189,7 @@ factory = function(winstonLogger, classMeta, opts) {
           }
           level = "info";
           if ((400 <= (_ref = res.statusCode) && _ref < 500)) {
-            level = "warn";
+            level = "warning";
           }
           if (res.statusCode >= 500) {
             level = "error";
