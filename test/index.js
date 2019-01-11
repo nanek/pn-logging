@@ -180,6 +180,13 @@ describe('index', function() {
         const infoStub = sinon.stub(res.locals._log, 'info')
         res.end()
         sinon.assert.calledOnce(infoStub)
+        sinon.assert.calledWithExactly(infoStub, 'request')
+        const logObj = res.locals._log
+        expect(logObj).to.have.property('meta')
+        expect(logObj.meta).to.eql( { reqPath: '/path',
+                                      reqQuery: '',
+                                      reqQueryChars: 0,
+                                      resStatus: '200' })
         done()
       })
     });
@@ -199,6 +206,12 @@ describe('index', function() {
         const warningStub = sinon.stub(res.locals._log, 'warning')
         res.end()
         sinon.assert.calledOnce(warningStub)
+        const logObj = res.locals._log
+        expect(logObj).to.have.property('meta')
+        expect(logObj.meta).to.eql( { reqPath: '/path',
+                                      reqQuery: '',
+                                      reqQueryChars: 0,
+                                      resStatus: '400' })
         done()
       })
     });
@@ -218,10 +231,15 @@ describe('index', function() {
         const errorStub = sinon.stub(res.locals._log, 'error')
         res.end()
         sinon.assert.calledOnce(errorStub)
+        const logObj = res.locals._log
+        expect(logObj.meta).to.eql( { reqPath: '/path',
+                                      reqQuery: '',
+                                      reqQueryChars: 0,
+                                      resStatus: '500' })
         done()
       })
-    })    
-    
+    })
+
   });
 
   describe('_getSentryMeta', function() {
