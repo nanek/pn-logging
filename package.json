@@ -1,6 +1,6 @@
 {
   "name": "pn-logging",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "A logging wrapper around winston and sentry.",
   "main": "index.js",
   "repository": {
