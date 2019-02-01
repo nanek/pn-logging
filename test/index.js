@@ -159,38 +159,45 @@ describe('index', function() {
     });
 
     function makeReq(props) {
-      return Object.assign({url: 'http://example.com/path', path: '/path'}, props)
+      return Object.assign(
+        { url: 'http://example.com/path', path: '/path' },
+        props
+      );
     }
 
     function makeRes(props) {
-      return Object.assign({locals: {}, statusCode: 200, end: () => {}}, props)
+      return Object.assign(
+        { locals: {}, statusCode: 200, end: () => {} },
+        props
+      );
     }
 
     it('should patch res.end and emit an info log instance for a 200 response', function(done) {
       var log = new index.Log({ transports: [], sentry: {} });
       var middleware = log.middleware();
-      assert(middleware, log._winexConstructor.middleware())
 
       var req = makeReq();
       var res = makeRes();
 
-      middleware(req, res, (err) => {
-        expect(err).to.be.undefined
-        expect(res.end).to.be.a('function')
-        expect(res.locals._log).to.be.ok
-        expect(res.locals._log.info).to.be.a('function')
-        const infoStub = sinon.stub(res.locals._log, 'info')
-        res.end()
-        sinon.assert.calledOnce(infoStub)
-        sinon.assert.calledWithExactly(infoStub, 'request')
-        const logObj = res.locals._log
-        expect(logObj).to.have.property('meta')
-        expect(logObj.meta).to.eql( { reqPath: '/path',
-                                      reqQuery: '',
-                                      reqQueryChars: 0,
-                                      resStatus: '200' })
-        done()
-      })
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const infoStub = sinon.stub(res.locals._log, 'info');
+        res.end();
+        sinon.assert.calledOnce(infoStub);
+        sinon.assert.calledWithExactly(infoStub, 'request');
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '200',
+        });
+        done();
+      });
     });
 
     it('should patch res.end and emit a warning log instance for a 400 response', function(done) {
@@ -198,24 +205,26 @@ describe('index', function() {
       var middleware = log.middleware();
 
       var req = makeReq();
-      var res = makeRes({statusCode: 400});
+      var res = makeRes({ statusCode: 400 });
 
-      middleware(req, res, (err) => {
-        expect(err).to.be.undefined
-        expect(res.end).to.be.a('function')
-        expect(res.locals._log).to.be.ok
-        expect(res.locals._log.info).to.be.a('function')
-        const warningStub = sinon.stub(res.locals._log, 'warning')
-        res.end()
-        sinon.assert.calledOnce(warningStub)
-        const logObj = res.locals._log
-        expect(logObj).to.have.property('meta')
-        expect(logObj.meta).to.eql( { reqPath: '/path',
-                                      reqQuery: '',
-                                      reqQueryChars: 0,
-                                      resStatus: '400' })
-        done()
-      })
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.calledOnce(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '400',
+        });
+        done();
+      });
     });
 
     it('should patch res.end and emit an error log instance for a 500 response', function(done) {
@@ -223,25 +232,26 @@ describe('index', function() {
       var middleware = log.middleware();
 
       var req = makeReq();
-      var res = makeRes({statusCode: 500});
+      var res = makeRes({ statusCode: 500 });
 
-      middleware(req, res, (err) => {
-        expect(err).to.be.undefined
-        expect(res.end).to.be.a('function')
-        expect(res.locals._log).to.be.ok
-        expect(res.locals._log.info).to.be.a('function')
-        const errorStub = sinon.stub(res.locals._log, 'error')
-        res.end()
-        sinon.assert.calledOnce(errorStub)
-        const logObj = res.locals._log
-        expect(logObj.meta).to.eql( { reqPath: '/path',
-                                      reqQuery: '',
-                                      reqQueryChars: 0,
-                                      resStatus: '500' })
-        done()
-      })
-    })
-
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const errorStub = sinon.stub(res.locals._log, 'error');
+        res.end();
+        sinon.assert.calledOnce(errorStub);
+        const logObj = res.locals._log;
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '500',
+        });
+        done();
+      });
+    });
   });
 
   describe('_getSentryMeta', function() {
