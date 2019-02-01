@@ -7,7 +7,7 @@ var sinon = require('sinon');
 var winston = require('winston');
 var TestTransport = require('./mock/test-transport');
 var index = require('../index');
-const assert = require('assert')
+const assert = require('assert');
 
 describe('index', function() {
   var sandbox;
@@ -139,6 +139,119 @@ describe('index', function() {
       var args = spy.args[0];
 
       expect(args[2]).to.have.property('name', 'Dan');
+    });
+  });
+
+  describe('Winex Log class', () => {
+    function makeReq(props) {
+      return Object.assign(
+        { url: 'http://example.com/path', path: '/path' },
+        props
+      );
+    }
+
+    function makeRes(props) {
+      return Object.assign(
+        { locals: {}, statusCode: 200, end: () => {} },
+        props
+      );
+    }
+
+    it('should be donating its middleware handler to pn-logging Log', function() {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware();
+      assert(middleware, log._winexConstructor.middleware());
+    });
+
+    var name = () => {
+      const log = new index.Log({ transports: [], sentry: {} });
+      const WinexLog = log._winexConstructor;
+      const winexLog = new WinexLog();
+
+      expect(winexLog).to.have.property('meta');
+      expect(winexLog.meta).to.eql({});
+
+      var req = makeReq();
+      winexLog.addReq(req);
+      var reqMeta = {
+        reqPath: '/path',
+        reqQuery: '',
+        reqQueryChars: 0,
+      };
+      expect(winexLog.meta).to.eql(reqMeta);
+
+      var res = makeRes();
+      winexLog.addRes(res);
+      var resMeta = {
+        resStatus: '200',
+      };
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
+
+      var metaMeta = {
+        newField: 'soWhat',
+      };
+      winexLog.addMeta(metaMeta);
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
+      expect(winexLog.meta).to.contain(metaMeta);
+
+      const err = new Error('zoinks');
+      const errMeta = { code: -42, type: 'unusual', stack: 'blessedly short' };
+      Object.assign(err, errMeta);
+      Object.getOwnPropertyNames(errMeta).forEach(prop => {
+        errMeta;
+      });
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
+      expect(winexLog.meta).to.contain(metaMeta);
+      expect(winexLog.meta).to.contain(errMeta);
+    };
+    it('should do some stuff', () => {
+      var log = new index.Log({ transports: [], sentry: {} });
+      const WinexLog = log._winexConstructor;
+      const winexLog = new WinexLog();
+
+      expect(winexLog).to.have.property('meta');
+      expect(winexLog.meta).to.eql({});
+
+      var req = makeReq();
+      winexLog.addReq(req);
+      var reqMeta = {
+        reqPath: '/path',
+        reqQuery: '',
+        reqQueryChars: 0,
+      };
+      expect(winexLog.meta).to.eql(reqMeta);
+
+      var res = makeRes();
+      winexLog.addRes(res);
+      var resMeta = {
+        resStatus: '200',
+      };
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
+
+      var metaMeta = {
+        newField: 'soWhat',
+      };
+      winexLog.addMeta(metaMeta);
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
+      expect(winexLog.meta).to.contain(metaMeta);
+
+      const err = new Error('zoinks');
+      Object.assign(err, {
+        code: -42,
+        type: 'unusual',
+        stack: 'blessedly short',
+      });
+      const errMeta = { errType: 'unusual', errStack: 'blessedly short' };
+      winexLog.addError(err);
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
+      expect(winexLog.meta).to.contain(metaMeta);
+      expect(winexLog.meta).to.contain(errMeta);
     });
   });
 
