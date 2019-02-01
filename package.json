@@ -2,6 +2,9 @@
   "name": "pn-logging",
   "version": "5.0.0",
   "description": "A logging wrapper around winston and sentry.",
+  "engines": {
+    "node": ">=4"
+  },
   "main": "index.js",
   "repository": {
     "type": "git",

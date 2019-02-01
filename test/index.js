@@ -144,10 +144,7 @@ describe('index', function() {
 
   describe('Winex Log class', () => {
     function makeReq(props) {
-      return Object.assign(
-        { url: 'http://example.com/path' },
-        props
-      );
+      return Object.assign({ url: 'http://example.com/path' }, props);
     }
 
     function makeRes(props) {
@@ -163,51 +160,7 @@ describe('index', function() {
       assert(middleware, log._winexConstructor.middleware());
     });
 
-    var name = () => {
-      const log = new index.Log({ transports: [], sentry: {} });
-      const WinexLog = log._winexConstructor;
-      const winexLog = new WinexLog();
-
-      expect(winexLog).to.have.property('meta');
-      expect(winexLog.meta).to.eql({});
-
-      var req = makeReq();
-      winexLog.addReq(req);
-      var reqMeta = {
-        reqPath: '/path',
-        reqQuery: '',
-        reqQueryChars: 0,
-      };
-      expect(winexLog.meta).to.eql(reqMeta);
-
-      var res = makeRes();
-      winexLog.addRes(res);
-      var resMeta = {
-        resStatus: '200',
-      };
-      expect(winexLog.meta).to.contain(reqMeta);
-      expect(winexLog.meta).to.contain(resMeta);
-
-      var metaMeta = {
-        newField: 'soWhat',
-      };
-      winexLog.addMeta(metaMeta);
-      expect(winexLog.meta).to.contain(reqMeta);
-      expect(winexLog.meta).to.contain(resMeta);
-      expect(winexLog.meta).to.contain(metaMeta);
-
-      const err = new Error('zoinks');
-      const errMeta = { code: -42, type: 'unusual', stack: 'blessedly short' };
-      Object.assign(err, errMeta);
-      Object.getOwnPropertyNames(errMeta).forEach(prop => {
-        errMeta;
-      });
-      expect(winexLog.meta).to.contain(reqMeta);
-      expect(winexLog.meta).to.contain(resMeta);
-      expect(winexLog.meta).to.contain(metaMeta);
-      expect(winexLog.meta).to.contain(errMeta);
-    };
-    it('should do some stuff', () => {
+    it('should allow adding to meta via several methods', () => {
       var log = new index.Log({ transports: [], sentry: {} });
       const WinexLog = log._winexConstructor;
       const winexLog = new WinexLog();
@@ -215,6 +168,12 @@ describe('index', function() {
       expect(winexLog).to.have.property('meta');
       expect(winexLog.meta).to.eql({});
 
+      var metaMeta = {
+        newField: 'soWhat',
+      };
+      winexLog.addMeta(metaMeta);
+      expect(winexLog.meta).to.eql(metaMeta);
+
       var req = makeReq();
       winexLog.addReq(req);
       var reqMeta = {
@@ -222,31 +181,29 @@ describe('index', function() {
         reqQuery: '',
         reqQueryChars: 0,
       };
-      expect(winexLog.meta).to.eql(reqMeta);
+      expect(winexLog.meta).to.contain(metaMeta);
+      expect(winexLog.meta).to.contain(reqMeta);
 
       var res = makeRes();
       winexLog.addRes(res);
       var resMeta = {
         resStatus: '200',
       };
-      expect(winexLog.meta).to.contain(reqMeta);
-      expect(winexLog.meta).to.contain(resMeta);
-
-      var metaMeta = {
-        newField: 'soWhat',
-      };
-      winexLog.addMeta(metaMeta);
-      expect(winexLog.meta).to.contain(reqMeta);
-      expect(winexLog.meta).to.contain(resMeta);
       expect(winexLog.meta).to.contain(metaMeta);
+      expect(winexLog.meta).to.contain(reqMeta);
+      expect(winexLog.meta).to.contain(resMeta);
 
       const err = new Error('zoinks');
       Object.assign(err, {
-        code: -42,
         type: 'unusual',
         stack: 'blessedly short',
+        code: -42,
       });
-      const errMeta = { errType: 'unusual', errStack: 'blessedly short' };
+      const errMeta = {
+        errType: 'unusual',
+        errStack: 'blessedly short',
+        errCode: -42,
+      };
       winexLog.addError(err);
       expect(winexLog.meta).to.contain(reqMeta);
       expect(winexLog.meta).to.contain(resMeta);
@@ -272,10 +229,7 @@ describe('index', function() {
     });
 
     function makeReq(props) {
-      return Object.assign(
-        { url: 'http://example.com/path' },
-        props
-      );
+      return Object.assign({ url: 'http://example.com/path' }, props);
     }
 
     function makeRes(props) {
@@ -340,6 +294,62 @@ describe('index', function() {
       });
     });
 
+    it('should patch res.end and emit a warning log instance for a 404 response', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware();
+
+      var req = makeReq();
+      var res = makeRes({ statusCode: 404 });
+
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.calledOnce(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '404',
+        });
+        done();
+      });
+    });
+
+    it('should patch res.end and emit an info log instance for a 404 response with info404 option', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware({ info404: true });
+
+      var req = makeReq();
+      var res = makeRes({ statusCode: 404 });
+
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const infoStub = sinon.stub(res.locals._log, 'info');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.calledOnce(infoStub);
+        sinon.assert.notCalled(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '404',
+        });
+        done();
+      });
+    });
+
     it('should patch res.end and emit an error log instance for a 500 response', function(done) {
       var log = new index.Log({ transports: [], sentry: {} });
       var middleware = log.middleware();
@@ -361,6 +371,64 @@ describe('index', function() {
           reqQuery: '',
           reqQueryChars: 0,
           resStatus: '500',
+        });
+        done();
+      });
+    });
+
+    it('should allow overriding the level with log.level', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware({ info404: true });
+
+      var req = makeReq();
+      var res = makeRes();
+
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+
+        // log a 200 as a warning
+        res.locals._log.level = 'warning';
+        const infoStub = sinon.stub(res.locals._log, 'info');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.notCalled(infoStub);
+        sinon.assert.calledOnce(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '200',
+        });
+        done();
+      });
+    });
+
+    it('should correctly count multibyte characters in url query', function(done) {
+      var log = new index.Log({ transports: [], sentry: {} });
+      var middleware = log.middleware({ info404: true });
+
+      var req = makeReq({ url: 'http://smi.li/?q=💩' });
+      var res = makeRes();
+
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+
+        // log a 200 as a warning
+        res.locals._log.level = 'warning';
+        const infoStub = sinon.stub(res.locals._log, 'info');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.notCalled(infoStub);
+        sinon.assert.calledOnce(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/',
+          reqQuery: 'q=💩',
+          reqQueryChars: 3,
+          resStatus: '200',
         });
         done();
       });
