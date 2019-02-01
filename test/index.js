@@ -145,7 +145,7 @@ describe('index', function() {
   describe('Winex Log class', () => {
     function makeReq(props) {
       return Object.assign(
-        { url: 'http://example.com/path', path: '/path' },
+        { url: 'http://example.com/path' },
         props
       );
     }
@@ -273,7 +273,7 @@ describe('index', function() {
 
     function makeReq(props) {
       return Object.assign(
-        { url: 'http://example.com/path', path: '/path' },
+        { url: 'http://example.com/path' },
         props
       );
     }
