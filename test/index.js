@@ -7,6 +7,7 @@ var sinon = require('sinon');
 var winston = require('winston');
 var TestTransport = require('./mock/test-transport');
 var index = require('../index');
+const assert = require('assert')
 
 describe('index', function() {
   var sandbox;
@@ -168,6 +169,7 @@ describe('index', function() {
     it('should patch res.end and emit an info log instance for a 200 response', function(done) {
       var log = new index.Log({ transports: [], sentry: {} });
       var middleware = log.middleware();
+      assert(middleware, log._winexConstructor.middleware())
 
       var req = makeReq();
       var res = makeRes();
