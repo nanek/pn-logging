@@ -30,6 +30,6 @@
     "style": "eslint index.js test",
     "test": "env NODE_ENV=test istanbul cover node_modules/.bin/_mocha -- --recursive test",
     "check": "npm run style && npm test",
-    "watch:test": "mocha -w --recursive test"
+    "watch:test": "env NODE_ENV=test mocha -w --recursive test"
   }
 }
