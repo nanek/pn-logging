@@ -7,7 +7,6 @@ var sinon = require('sinon');
 var winston = require('winston');
 var TestTransport = require('./mock/test-transport');
 var index = require('../index');
-const assert = require('assert');
 
 describe('index', function() {
   var sandbox;
@@ -154,10 +153,9 @@ describe('index', function() {
       );
     }
 
-    it('should be donating its middleware handler to pn-logging Log', function() {
+    it('should be lending its middleware handler to pn-logging Log class', function() {
       var log = new index.Log({ transports: [], sentry: {} });
-      var middleware = log.middleware();
-      assert(middleware, log._winexConstructor.middleware());
+      expect(log.middleware).to.equal(log._winexConstructor.middleware);
     });
 
     it('should allow adding to meta via several methods', () => {
@@ -415,7 +413,6 @@ describe('index', function() {
       middleware(req, res, err => {
         expect(err).to.be.undefined;
 
-        // log a 200 as a warning
         res.locals._log.level = 'warning';
         const infoStub = sinon.stub(res.locals._log, 'info');
         const warningStub = sinon.stub(res.locals._log, 'warning');
