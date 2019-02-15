@@ -33,6 +33,17 @@ describe('index', function() {
       expect(tryMakeBadLog).to.throw(/No transports found/);
     });
 
+    it('should take transports from defaults', function() {
+      index.Log.setDefaults({
+        winstonOpts: {
+          transports: []
+        }
+      })
+      var log = new index.Log();
+
+      expect(log).to.be.an.instanceOf(index.Log);
+    });
+
     it('should have a debug method', function() {
       var log = new index.Log({ transports: [], sentry: {} });
 
@@ -85,6 +96,42 @@ describe('index', function() {
       expect(winston.transports).to.have.property('Loggly');
     });
   });
+
+  describe('log methods with defaults', function() {
+    var log;
+    var spy;
+
+    beforeEach(function() {
+      index.Log.setDefaults({
+        meta: {
+          hacky: true
+        },
+      })
+      sandbox.stub(winston, 'transports', { TestTransport: TestTransport });
+
+      spy = sinon.spy();
+      log = new index.Log({
+        transports: [
+          {
+            TestTransport: {
+              level: 'debug',
+              __log: spy,
+            },
+          },
+        ],
+        sentry: {},
+      });
+    });
+
+    it('should log defaults', function() {
+      log.debug('hi', { name: 'Dan' });
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('name', 'Dan');
+      expect(args[2]).to.have.property('hacky', true);
+    })
+  })
 
   describe('log methods', function() {
     var log;
