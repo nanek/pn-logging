@@ -6,6 +6,7 @@ var util = require('util');
 var winston = require('winston');
 var winex = require('./winex');
 var raven = require('raven');
+const _ = require('lodash');
 var { omit, merge } = require('lodash');
 
 var sysLogLevels;
@@ -64,13 +65,19 @@ sysLogLevels = {
  */
 function Log(options) {
   options = options || {}
-  console.log("DEBUG: options.transports originally", options.transports);
-  console.log("DEBUG: Log.defaultWinstonOpts.transports", Log.defaultWinstonOpts.transports);
-  options.transports = options.transports || Log.defaultWinstonOpts.transports;
-  console.log("DEBUG: options.transports is now", options.transports);
-  if (Log.defaultWinstonOpts && Log.defaultWinstonOpts.transports)
-    delete Log.defaultWinstonOpts.transports;
-  console.log("DEBUG: options.transports after deletion", options.transports);
+
+  // Fork global defaults for this instance.
+  const _defaults = Object.assign({}, {
+    winstonOpts: _.cloneDeep(Log.defaultWinstonOpts),
+    winexMeta: _.cloneDeep(Log.defaultWinexMeta),
+    winexOpts: _.cloneDeep(Log.defaultWinexOpts)
+  });
+
+  // Capture transports provided, or else defaults.
+  if (!options.transports && _defaults.winstonOpts && _defaults.winstonOpts.transports) {
+    options.transports = _defaults.winstonOpts.transports
+  }
+
   if (!options.transports) {
     throw new Error('No transports found');
   }
@@ -82,14 +89,14 @@ function Log(options) {
     return new Transport(opts);
   });
 
-  const winstonOpts = Object.assign({
+  const winstonOpts = {
     levels: sysLogLevels.levels,
     transports: logTransports,
-  }, Log.defaultWinstonOpts);
+  }
 
-  const winstonLogger = new winston.Logger(winstonOpts || Log.defaultWinstonOpts);
-  const winexMeta = Object.assign({}, Log.defaultWinexMeta, options.meta)
-  const winexOpts = Object.assign({}, Log.defaultWinexOpts, options.opts)
+  const winstonLogger = new winston.Logger(winstonOpts || _defaults.winstonOpts);
+  const winexMeta = Object.assign({}, _defaults.winexMeta, options.meta)
+  const winexOpts = Object.assign({}, _defaults.w9inexOpts, options.opts)
 
   this._winexConstructor = winex.factory(winstonLogger, winexMeta, winexOpts);
 
@@ -127,7 +134,6 @@ Log.defaultWinexOpts = {}
  */
 Log.setDefaults = (defaults) => {
   Log.defaultWinstonOpts  = defaults.winstonOpts
-  console.log("DEBUG: Log.defaultWinstonOpts is now", Log.defaultWinstonOpts);
   Log.defaultWinexMeta    = defaults.meta
   Log.defaultWinexOpts    = defaults.opts
 }
