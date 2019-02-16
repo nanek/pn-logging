@@ -64,9 +64,13 @@ sysLogLevels = {
  */
 function Log(options) {
   options = options || {}
-  options.transports = options.transports || Log.defaultWinstonOpts.transports
+  console.log("DEBUG: options.transports originally", options.transports);
+  console.log("DEBUG: Log.defaultWinstonOpts.transports", Log.defaultWinstonOpts.transports);
+  options.transports = options.transports || Log.defaultWinstonOpts.transports;
+  console.log("DEBUG: options.transports is now", options.transports);
   if (Log.defaultWinstonOpts && Log.defaultWinstonOpts.transports)
     delete Log.defaultWinstonOpts.transports;
+  console.log("DEBUG: options.transports after deletion", options.transports);
   if (!options.transports) {
     throw new Error('No transports found');
   }
@@ -123,6 +127,7 @@ Log.defaultWinexOpts = {}
  */
 Log.setDefaults = (defaults) => {
   Log.defaultWinstonOpts  = defaults.winstonOpts
+  console.log("DEBUG: Log.defaultWinstonOpts is now", Log.defaultWinstonOpts);
   Log.defaultWinexMeta    = defaults.meta
   Log.defaultWinexOpts    = defaults.opts
 }
