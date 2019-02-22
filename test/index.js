@@ -2,6 +2,7 @@
 
 'use strict';
 
+const assert = require('assert');
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var winston = require('winston');
@@ -85,6 +86,48 @@ describe('index', function() {
       expect(winston.transports).to.have.property('Loggly');
     });
   });
+
+  describe('Log usage', function() {
+    var log;
+    var spy;
+
+    beforeEach(function() {
+      sandbox.stub(winston, 'transports', { TestTransport: TestTransport });
+
+      spy = sinon.spy();
+    });
+
+    it('should include default meta in log messages', function() {
+        log = new index.Log({
+          transports: [
+            {
+              TestTransport: {
+                level: 'debug',
+                __log: spy,
+              },
+            },
+          ],
+          sentry: {},
+          meta: {
+            type: 'server',
+            key1: 'value1'
+          }
+        });
+
+      log.info('msg', {key2: 'value2'})
+
+      sinon.assert.calledOnce(spy);
+
+      const firstArg = spy.firstCall.args[0]
+      assert.equal(firstArg, 'info')
+
+      const secondArg = spy.firstCall.args[1]
+      assert.equal(secondArg, 'msg')
+
+      const metaArgs = spy.firstCall.args[2]
+      assert.equal(metaArgs.type, 'server')
+    });
+  })
 
   describe('log methods', function() {
     var log;
