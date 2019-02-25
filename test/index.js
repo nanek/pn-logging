@@ -86,6 +86,48 @@ describe('index', function() {
     });
   });
 
+  describe('Log usage', function() {
+    var log;
+    var spy;
+
+    beforeEach(function() {
+      sandbox.stub(winston, 'transports', { TestTransport: TestTransport });
+
+      spy = sinon.spy();
+    });
+
+    it('should include default meta in log messages', function() {
+        log = new index.Log({
+          transports: [
+            {
+              TestTransport: {
+                level: 'debug',
+                __log: spy,
+              },
+            },
+          ],
+          sentry: {},
+          meta: {
+            type: 'server',
+            key1: 'value1'
+          }
+        });
+
+      log.info('msg', {key2: 'value2'})
+
+      sinon.assert.calledOnce(spy);
+
+      const firstArg = spy.firstCall.args[0];
+      expect(firstArg).to.equal('info');
+
+      const secondArg = spy.firstCall.args[1];
+      expect(secondArg).to.equal('msg');
+
+      const metaArgs = spy.firstCall.args[2];
+      expect(metaArgs.type).to.equal('server');
+    });
+  })
+
   describe('log methods', function() {
     var log;
     var spy;
