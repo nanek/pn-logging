@@ -2,7 +2,6 @@
 
 'use strict';
 
-const assert = require('assert');
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var winston = require('winston');
@@ -118,14 +117,14 @@ describe('index', function() {
 
       sinon.assert.calledOnce(spy);
 
-      const firstArg = spy.firstCall.args[0]
-      assert.equal(firstArg, 'info')
+      const firstArg = spy.firstCall.args[0];
+      expect(firstArg).to.equal('info');
 
-      const secondArg = spy.firstCall.args[1]
-      assert.equal(secondArg, 'msg')
+      const secondArg = spy.firstCall.args[1];
+      expect(secondArg).to.equal('msg');
 
-      const metaArgs = spy.firstCall.args[2]
-      assert.equal(metaArgs.type, 'server')
+      const metaArgs = spy.firstCall.args[2];
+      expect(metaArgs.type).to.equal('server');
     });
   })
 
