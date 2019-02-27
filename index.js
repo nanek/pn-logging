@@ -74,6 +74,12 @@ function Log(options) {
     throw new Error('No transports found');
   }
 
+  if (options.req)
+    this.req = options.req;
+
+  if (options.res)
+    this.res = options.res;
+
   if (options.rawTransports){
     logTransports = options.transports
   } else {
@@ -117,6 +123,14 @@ function Log(options) {
   }
 }
 
+Log.prototype.addReq = function addReq(req) {
+  this.req = req
+}
+
+Log.prototype.addRes = function addRes(res) {
+  this.res = res
+}
+
 /**
  * Helper function for attaching methods to the logger prototype.
  *
@@ -136,6 +150,12 @@ function _logger(level) {
     if (meta) {
       log.addMeta(meta);
     }
+
+    if (this.req)
+      log.addReq(this.req)
+
+    if (this.res)
+      log.addRes(this.res)
 
     if (error) {
       this.ravenClient.captureException(error, _getSentryMeta(meta));

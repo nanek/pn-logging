@@ -97,23 +97,23 @@ describe('index', function() {
     });
 
     it('should include default meta in log messages', function() {
-        log = new index.Log({
-          transports: [
-            {
-              TestTransport: {
-                level: 'debug',
-                __log: spy,
-              },
+      log = new index.Log({
+        transports: [
+          {
+            TestTransport: {
+              level: 'debug',
+              __log: spy,
             },
-          ],
-          sentry: {},
-          meta: {
-            type: 'server',
-            key1: 'value1'
-          }
-        });
+          },
+        ],
+        sentry: {},
+        meta: {
+          type: 'server',
+          key1: 'value1',
+        },
+      });
 
-      log.info('msg', {key2: 'value2'})
+      log.info('msg', { key2: 'value2' });
 
       sinon.assert.calledOnce(spy);
 
@@ -126,7 +126,55 @@ describe('index', function() {
       const metaArgs = spy.firstCall.args[2];
       expect(metaArgs.type).to.equal('server');
     });
-  })
+
+    it('should accept req and res', function() {
+      log = new index.Log({
+        transports: [
+          {
+            TestTransport: {
+              level: 'debug',
+              __log: spy,
+            },
+          },
+        ],
+        sentry: {},
+        req: {
+          headers: {
+            host: 'guest',
+          },
+          method: 'take',
+          connection: {
+            remoteAddress: '4.3.2.1',
+          },
+          url: 'ptth://guest/req/path?will this work',
+          pathname: '/req/path',
+        },
+        res: {
+          statusCode: 1000000,
+        },
+      });
+
+      log.info('msg');
+
+      sinon.assert.calledOnce(spy);
+
+      const firstArg = spy.firstCall.args[0];
+      expect(firstArg).to.equal('info');
+
+      const secondArg = spy.firstCall.args[1];
+      expect(secondArg).to.equal('msg');
+
+      const metaArgs = spy.firstCall.args[2];
+      expect(metaArgs.reqClient).to.equal('4.3.2.1');
+      expect(metaArgs.reqHost).to.equal('guest');
+      expect(metaArgs.reqMethod).to.equal('take');
+      expect(metaArgs.reqPath).to.equal('/req/path');
+      expect(metaArgs.reqQuery).to.equal('will%20this%20work');
+      expect(metaArgs.reqQueryChars).to.equal(18);
+
+      expect(metaArgs.resStatus).to.equal('1000000');
+    });
+  });
 
   describe('log methods', function() {
     var log;
@@ -180,6 +228,31 @@ describe('index', function() {
       var args = spy.args[0];
 
       expect(args[2]).to.have.property('name', 'Dan');
+    });
+
+    it('should support addReq and addRes', function() {
+      log.addReq({
+        headers: {
+          host: 'guest',
+        },
+        method: 'take',
+        connection: {
+          remoteAddress: '4.3.2.1',
+        },
+        url: 'ptth://guest/req/path?will this work',
+        pathname: '/req/path',
+      });
+
+      log.addRes({
+        statusCode: 1000000,
+      });
+      log.debug('hi', { name: 'Dan' });
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('name', 'Dan');
+      expect(args[2]).to.have.property('reqHost', 'guest');
+      expect(args[2]).to.have.property('resStatus', '1000000');
     });
   });
 
