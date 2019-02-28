@@ -182,7 +182,7 @@ describe('index', function() {
       expect(args[2]).to.have.property('name', 'Dan');
     });
 
-    it('should support addReq and addRes', function() {
+    it('should support req and res arguments', function() {
       const req = {
         headers: {
           host: 'guest',
