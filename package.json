@@ -17,6 +17,7 @@
   "homepage": "https://github.com/spanishdict/pn-logging",
   "dependencies": {
     "deep-extend": "0.2.2",
+    "isobject": "3.0.1",
     "lodash": "4.17.11",
     "raven": "0.9.0",
     "winston": "2.1.1",
