@@ -75,12 +75,6 @@ function Log(options) {
     throw new Error('No transports found');
   }
 
-  if (options.req)
-    this.req = options.req;
-
-  if (options.res)
-    this.res = options.res;
-
   if (options.rawTransports){
     logTransports = options.transports
   } else {
@@ -122,14 +116,6 @@ function Log(options) {
   } else {
     this.ravenClient = new raven.Client(false);
   }
-}
-
-Log.prototype.addReq = function addReq(req) {
-  this.req = req
-}
-
-Log.prototype.addRes = function addRes(res) {
-  this.res = res
 }
 
 /**
