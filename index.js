@@ -7,6 +7,7 @@ var winston = require('winston');
 var winex = require('./winex');
 var raven = require('raven');
 var { omit, merge } = require('lodash');
+var isobject = require('isobject')
 
 var sysLogLevels;
 
@@ -140,6 +141,13 @@ Log.prototype.addRes = function addRes(res) {
  */
 function _logger(level) {
   return function(message, meta, error, req, res) {
+    if (isobject(message)) {
+      meta = meta ? Object.assign(meta, message.meta) : message.meta;
+      error = error ? error : message.error;
+      req = req ? req : message.req;
+      res = res ? res : message.res;
+      message = message.message || message.msg;
+    }
     var log = new this._winexConstructor({meta: this.defaultMeta});
 
     if (util.isError(meta)) {

@@ -126,7 +126,6 @@ describe('index', function() {
       const metaArgs = spy.firstCall.args[2];
       expect(metaArgs.type).to.equal('server');
     });
-
   });
 
   describe('log methods', function() {
@@ -206,6 +205,61 @@ describe('index', function() {
       expect(args[2]).to.have.property('name', 'Dan');
       expect(args[2]).to.have.property('reqHost', 'guest');
       expect(args[2]).to.have.property('resStatus', '1000000');
+    });
+
+    it('should support opts hash', function() {
+      const err = new Error('zot');
+      const req = {
+        headers: {
+          host: 'guest',
+        },
+        method: 'take',
+        connection: {
+          remoteAddress: '4.3.2.1',
+        },
+        url: 'ptth://guest/req/path?will this work',
+        pathname: '/req/path',
+      };
+
+      const res = {
+        statusCode: 1000000,
+      };
+      const opts = {
+        message: 'hi',
+        meta: {
+          key1: 'val1',
+        },
+        error: err,
+        req: req,
+        res: res,
+      };
+      log.debug(opts);
+
+      var args = spy.args[0];
+
+      expect(args[1]).to.equal('hi');
+      expect(args[2]).to.have.property('key1', 'val1');
+      expect(args[2]).to.have.property('errMsg', 'zot');
+      expect(args[2]).to.have.property('reqHost', 'guest');
+      expect(args[2]).to.have.property('resStatus', '1000000');
+    });
+
+    it('should mixin or favor explicit arguments over opts hash values', function() {
+      const opts = {
+        message: 'hi',
+        meta: {
+          key1: 'val1',
+        },
+        error: null,
+      };
+      log.debug(opts, { key2: 'val2' }, new Error('zot'));
+
+      var args = spy.args[0];
+
+      expect(args[1]).to.equal('hi');
+      expect(args[2]).to.have.property('key1', 'val1');
+      expect(args[2]).to.have.property('key2', 'val2');
+      expect(args[2]).to.have.property('errMsg', 'zot');
     });
   });
 
