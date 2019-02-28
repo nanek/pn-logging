@@ -139,7 +139,7 @@ Log.prototype.addRes = function addRes(res) {
  * @return {Function} Logging method to attach to the Log prototype.
  */
 function _logger(level) {
-  return function(message, meta, error) {
+  return function(message, meta, error, req, res) {
     var log = new this._winexConstructor({meta: this.defaultMeta});
 
     if (util.isError(meta)) {
@@ -151,11 +151,11 @@ function _logger(level) {
       log.addMeta(meta);
     }
 
-    if (this.req)
-      log.addReq(this.req)
+    if (req)
+      log.addReq(req)
 
-    if (this.res)
-      log.addRes(this.res)
+    if (res)
+      log.addRes(res)
 
     if (error) {
       this.ravenClient.captureException(error, _getSentryMeta(meta));
