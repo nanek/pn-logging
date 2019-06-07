@@ -212,7 +212,7 @@ factory = function(winstonLogger, classMeta, opts) {
         req = {};
       }
       maxChars = 200;
-      urlObj = url.parse(req != null ? req.url : void 0);
+      urlObj = req.url && url.parse(req.url);
       path = (ref = urlObj != null ? urlObj.pathname : void 0) != null ? ref : "";
       query = (ref1 = urlObj != null ? urlObj.query : void 0) != null ? ref1 : "";
       queryChars = Array.from(query).length;

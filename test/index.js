@@ -207,6 +207,30 @@ describe('index', function() {
       expect(args[2]).to.have.property('resStatus', '1000000');
     });
 
+    it('should support req with undefined url', function() {
+      const req = {
+        headers: {
+          host: 'guest',
+        },
+        method: 'take',
+        connection: {
+          remoteAddress: '4.3.2.1',
+        },
+        pathname: '/req/path',
+      };
+
+      const res = {
+        statusCode: 1000000,
+      };
+      log.info('hi', { name: 'Dan' }, null, req, res);
+
+      var args = spy.args[0];
+
+      expect(args[2]).to.have.property('name', 'Dan');
+      expect(args[2]).to.have.property('reqHost', 'guest');
+      expect(args[2]).to.have.property('resStatus', '1000000');
+    })
+
     it('should support opts hash', function() {
       const err = new Error('zot');
       const req = {
