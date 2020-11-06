@@ -5,7 +5,6 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('./winex');
-var isobject = require('isobject')
 
 var sysLogLevels;
 
@@ -98,6 +97,11 @@ function Log(options) {
   this.middleware = this._winexConstructor.middleware;
 }
 
+// https://github.com/jonschlinkert/isobject/blob/master/index.js
+function isObject(val) {
+  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+}
+
 /**
  * Helper function for attaching methods to the logger prototype.
  *
@@ -107,7 +111,7 @@ function Log(options) {
  */
 function _logger(level) {
   return function(message, meta, error, req, res) {
-    if (isobject(message)) {
+    if (isObject(message)) {
       meta = meta ? Object.assign(meta, message.meta) : message.meta;
       error = error ? error : message.error;
       req = req ? req : message.req;
