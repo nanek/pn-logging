@@ -21,7 +21,7 @@ describe('index', function() {
 
   describe('Log constructor', function() {
     it('should return a Log instance', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.be.an.instanceOf(index.Log);
     });
@@ -34,49 +34,49 @@ describe('index', function() {
     });
 
     it('should have a debug method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('debug');
     });
 
     it('should have a info method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('info');
     });
 
     it('should have a notice method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('notice');
     });
 
     it('should have a warning method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('warning');
     });
 
     it('should have a error method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('error');
     });
 
     it('should have a crit method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('crit');
     });
 
     it('should have a alert method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('alert');
     });
 
     it('should have a emerg method', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.respondTo('emerg');
     });
@@ -106,7 +106,6 @@ describe('index', function() {
             },
           },
         ],
-        sentry: {},
         meta: {
           type: 'server',
           key1: 'value1',
@@ -145,7 +144,6 @@ describe('index', function() {
             },
           },
         ],
-        sentry: {},
       });
     });
 
@@ -300,12 +298,12 @@ describe('index', function() {
     }
 
     it('should be lending its middleware handler to pn-logging Log class', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       expect(log.middleware).to.equal(log._winexConstructor.middleware);
     });
 
     it('should allow adding to meta via several methods', () => {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       const WinexLog = log._winexConstructor;
       const winexLog = new WinexLog();
 
@@ -358,14 +356,14 @@ describe('index', function() {
 
   describe('middleware', function() {
     it('should have middleware on the instance', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
 
       expect(log).to.have.property('middleware');
       expect(log.middleware).to.be.a('function');
     });
 
     it('should produce a middleware function', function() {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware();
 
       expect(middleware).to.be.a('function');
@@ -384,7 +382,7 @@ describe('index', function() {
     }
 
     it('should patch res.end and emit an info log instance for a 200 response', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware();
 
       var req = makeReq();
@@ -412,7 +410,7 @@ describe('index', function() {
     });
 
     it('should patch res.end and emit a warning log instance for a 400 response', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware();
 
       var req = makeReq();
@@ -439,7 +437,7 @@ describe('index', function() {
     });
 
     it('should patch res.end and emit a warning log instance for a 404 response', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware();
 
       var req = makeReq();
@@ -466,7 +464,7 @@ describe('index', function() {
     });
 
     it('should patch res.end and emit an info log instance for a 404 response with info404 option', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware({ info404: true });
 
       var req = makeReq();
@@ -495,7 +493,7 @@ describe('index', function() {
     });
 
     it('should patch res.end and emit an error log instance for a 500 response', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware();
 
       var req = makeReq();
@@ -521,7 +519,7 @@ describe('index', function() {
     });
 
     it('should allow overriding the level with log.level', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware({ info404: true });
 
       var req = makeReq();
@@ -550,7 +548,7 @@ describe('index', function() {
     });
 
     it('should correctly count multibyte characters in url query', function(done) {
-      var log = new index.Log({ transports: [], sentry: {} });
+      var log = new index.Log({ transports: [] });
       var middleware = log.middleware({ info404: true });
 
       var req = makeReq({ url: 'http://smi.li/?q=💩' });
@@ -574,143 +572,6 @@ describe('index', function() {
           resStatus: '200',
         });
         done();
-      });
-    });
-  });
-
-  describe('_getSentryMeta', function() {
-    it('should return just tags if meta is not defined', function() {
-      var result = index._getSentryMeta();
-
-      expect(result).to.deep.equal({
-        extra: {},
-        tags: {
-          env: 'test',
-        },
-        fingerprint: undefined,
-        level: undefined,
-      });
-    });
-
-    it('should add tags property', function() {
-      var input = {
-        tags: {
-          key1: 'value1',
-          key2: 'value2',
-        },
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result).to.have.property('tags');
-      expect(result.tags).to.have.property('key1', 'value1');
-      expect(result.tags).to.have.property('key2', 'value2');
-    });
-
-    it('should add fingerprint property', function() {
-      var input = {
-        fingerprint: 'fingerprintValue',
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result).to.have.property('fingerprint', 'fingerprintValue');
-    });
-
-    it('should add level property', function() {
-      var input = {
-        level: 'error',
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result).to.have.property('level', 'error');
-    });
-
-    it('should exclude tags, fingerprint, and level in extra', function() {
-      var input = {
-        level: 'error',
-        tags: 'tagsValue',
-        fingerprint: 'fingerprintValue',
-        key1: 'value1',
-        key2: 'value2',
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result).to.have.property('extra');
-      expect(result.extra).to.not.have.property('level');
-      expect(result.extra).to.not.have.property('tags');
-      expect(result.extra).to.not.have.property('fingerprint');
-    });
-
-    it('should include other property in extra', function() {
-      var input = {
-        level: 'error',
-        tags: 'tagsValue',
-        fingerprint: 'fingerprintValue',
-        key1: 'value1',
-        key2: 'value2',
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result).to.have.property('extra');
-      expect(result.extra).to.have.property('key1', 'value1');
-      expect(result.extra).to.have.property('key2', 'value2');
-    });
-
-    it('should add tags if no tags are defined', function() {
-      var input = {};
-
-      var result = index._getSentryMeta(input);
-
-      expect(result).to.have.property('extra');
-      expect(result.tags).to.have.property('env', 'test');
-    });
-
-    it('should add env to tags if no env is defined', function() {
-      var input = {
-        tags: {
-          key1: 'value1',
-          key2: 'value2',
-        },
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result.tags).to.have.property('env', 'test');
-    });
-
-    it('should not change env in tags if env is defined', function() {
-      var input = {
-        tags: {
-          key1: 'value1',
-          key2: 'value2',
-          env: 'production',
-        },
-      };
-
-      var result = index._getSentryMeta(input);
-
-      expect(result.tags).to.have.property('env', 'production');
-    });
-
-    it('should not mutate input', function() {
-      var input = {
-        tags: {
-          key1: 'value1',
-          key2: 'value2',
-        },
-      };
-
-      index._getSentryMeta(input);
-
-      expect(input).to.eql({
-        tags: {
-          key1: 'value1',
-          key2: 'value2',
-        },
       });
     });
   });

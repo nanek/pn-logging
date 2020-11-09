@@ -5,9 +5,6 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('./winex');
-var raven = require('raven');
-var { omit, merge } = require('lodash');
-var isobject = require('isobject')
 
 var sysLogLevels;
 
@@ -51,15 +48,6 @@ sysLogLevels = {
  *                                          ...
  *                                        }
  *                                      ]
- * @param {Object} options.sentry Config passed to sentry raven instance.
- *                                Should look like:
- *                                {
- *                                  // the account token
- *                                  dsn: string;
- *                                  // pass directly to raven constructor
- *                                  // refer to https://goo.gl/9Ud7Mz
- *                                  options: Object;
- *                                }
  * @param {Object} options.meta Meta defaults.
  * @param {boolean} options.rawTransports Pass true when the Winston transports passed in are instantiated (default false).
 
@@ -107,15 +95,11 @@ function Log(options) {
     @info404    {boolean} When true, log 404s as info instead of warning.
   */
   this.middleware = this._winexConstructor.middleware;
+}
 
-  if (options.sentry) {
-    this.ravenClient = new raven.Client(
-      options.sentry.dsn,
-      options.sentry.options
-    );
-  } else {
-    this.ravenClient = new raven.Client(false);
-  }
+// https://github.com/jonschlinkert/isobject/blob/master/index.js
+function isObject(val) {
+  return val != null && typeof val === 'object' && Array.isArray(val) === false;
 }
 
 /**
@@ -127,7 +111,7 @@ function Log(options) {
  */
 function _logger(level) {
   return function(message, meta, error, req, res) {
-    if (isobject(message)) {
+    if (isObject(message)) {
       meta = meta ? Object.assign(meta, message.meta) : message.meta;
       error = error ? error : message.error;
       req = req ? req : message.req;
@@ -152,43 +136,11 @@ function _logger(level) {
       log.addRes(res)
 
     if (error) {
-      this.ravenClient.captureException(error, _getSentryMeta(meta));
       log.addError(error);
     }
 
     log[level](message);
   };
-}
-
-/**
- * Format log meta to sentry optional attribute. See:
- * https://docs.getsentry.com/hosted/clients/node/usage/#optional-attributes
- *
- * @param {Object} [meta] Meta data passed to logger
- *
- * @return {Object} Optional attributes for sentry. Default will look like:
- *                  {
- *                    tags: {
- *                      env: 'development'
- *                    }
- *                  }
- */
-function _getSentryMeta(meta) {
-  var _meta = meta || {};
-
-  return merge(
-    {
-      tags: {
-        env: process.env.NODE_ENV || 'development',
-      },
-    },
-    {
-      extra: omit(_meta, ['tags', 'fingerprint', 'level']),
-      tags: _meta.tags,
-      fingerprint: _meta.fingerprint,
-      level: _meta.level,
-    }
-  );
 }
 
 Object.keys(sysLogLevels.levels).forEach(function(level) {
@@ -197,5 +149,4 @@ Object.keys(sysLogLevels.levels).forEach(function(level) {
 
 module.exports = {
   Log: Log,
-  _getSentryMeta: _getSentryMeta,
 };
