@@ -9,7 +9,7 @@ var winex = require('./winex');
 var sysLogLevels;
 
 // Exposes `winston.transports.Loggly`.
-var { flushLogsAndExit } = require('winston-loggly-bulk');
+require('winston-loggly-bulk');
 
 sysLogLevels = {
   levels: {
@@ -148,6 +148,5 @@ Object.keys(sysLogLevels.levels).forEach(function(level) {
 });
 
 module.exports = {
-  Log,
-  flushLogsAndExit,
+  Log: Log,
 };
