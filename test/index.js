@@ -80,10 +80,6 @@ describe('index', function() {
 
       expect(log).to.respondTo('emerg');
     });
-
-    it('should support winston-loggly', function() {
-      expect(winston.transports).to.have.property('Loggly');
-    });
   });
 
   describe('Log usage', function() {
