@@ -8,8 +8,8 @@ var winex = require('./winex');
 
 var sysLogLevels;
 
-// Exposes `winston.transports.Loggly`.
-require('winston-loggly');
+require('winston-loggly-bulk');
+
 
 sysLogLevels = {
   levels: {
@@ -82,7 +82,7 @@ function Log(options) {
   if (options.meta)
     this.defaultMeta = options.meta
 
-  winstonLog = new winston.Logger(winstonOpts);
+  winstonLog = winston.createLogger(winstonOpts);
   this._winexConstructor = winex.factory(winstonLog, options.meta);
 
   /*
@@ -120,7 +120,7 @@ function _logger(level) {
     }
     var log = new this._winexConstructor({meta: this.defaultMeta});
 
-    if (util.isError(meta)) {
+    if (util.types.isNativeError(meta)) {
       error = meta;
       meta = null;
     }
@@ -138,6 +138,7 @@ function _logger(level) {
     if (error) {
       log.addError(error);
     }
+    console.log("this is being run!");
 
     log[level](message);
   };
