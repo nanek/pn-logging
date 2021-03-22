@@ -5,6 +5,8 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('./winex');
+const { format } = require('logform');
+const { combine, json, prettyPrint } = format;
 
 var sysLogLevels;
 
@@ -23,6 +25,11 @@ sysLogLevels = {
     debug: 7,
   },
 };
+
+var prettyPrintWithJson = combine(
+    prettyPrint(),
+    json()
+);
 
 /**
  * Create a log object for public consumption.
@@ -76,6 +83,7 @@ function Log(options) {
 
   winstonOpts = {
     levels: sysLogLevels.levels,
+    formats: prettyPrintWithJson,
     transports: logTransports,
   };
 
@@ -138,7 +146,6 @@ function _logger(level) {
     if (error) {
       log.addError(error);
     }
-    console.log("this is being run!");
 
     log[level](message);
   };
