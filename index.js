@@ -27,8 +27,8 @@ sysLogLevels = {
 };
 
 var prettyPrintWithJson = combine(
-    prettyPrint(),
-    json()
+  json(),
+  prettyPrint({colorize: true}),
 );
 
 /**
@@ -76,14 +76,14 @@ function Log(options) {
     logTransports = options.transports.map(function(t) {
       var cls = Object.keys(t)[0];
       var opts = t[cls];
+      var opts2 = {level: 'info', format: prettyPrintWithJson}
       var Transport = winston.transports[cls];
-      return new Transport(opts);
+      return new Transport(opts2);
     });
   }
 
   winstonOpts = {
     levels: sysLogLevels.levels,
-    formats: prettyPrintWithJson,
     transports: logTransports,
   };
 
