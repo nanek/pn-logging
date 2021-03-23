@@ -26,10 +26,25 @@ sysLogLevels = {
   },
 };
 
-var prettyPrintWithJson = combine(
-  json(),
-  prettyPrint({colorize: true}),
-);
+/**
+ * setups up formatters for winston 3 format (https://github.com/winstonjs/winston#formats)
+ * @param {*} formatter options 
+ * @returns 
+ */
+function setupConsoleFormatters(options) {
+  var formatters = [];
+
+  if(options.json){
+    formatters.push(json());
+  }
+
+  if(options.prettyPrint || options.stringify == null){
+    let colorize = options.colorize == true ? true : false;
+    formatters.push(prettyPrint({colorize: colorize}))
+  }
+
+  return combine(...formatters);
+}
 
 /**
  * Create a log object for public consumption.
@@ -76,9 +91,12 @@ function Log(options) {
     logTransports = options.transports.map(function(t) {
       var cls = Object.keys(t)[0];
       var opts = t[cls];
-      var opts2 = {level: 'info', format: prettyPrintWithJson}
       var Transport = winston.transports[cls];
-      return new Transport(opts2);
+      if(Transport == winston.transports.Console){
+        var format = setupConsoleFormatters(opts);
+        opts.format = format;
+      }
+      return new Transport(opts);
     });
   }
 
