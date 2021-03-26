@@ -5,7 +5,7 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('./winex');
-const { format } = require('logform');
+const { format } = require('logform'); //depdency of wintson, ensure we are using the same version as winston
 const { combine, json, prettyPrint } = format;
 
 var sysLogLevels;
@@ -39,8 +39,8 @@ function setupConsoleFormatters(options) {
   }
 
   if(options.prettyPrint || options.stringify == null){
-    let colorize = options.colorize == true ? true : false;
-    formatters.push(prettyPrint({colorize: colorize}))
+    const colorize = options.colorize == true ? true : false;
+    formatters.push(prettyPrint({colorize}))
   }
 
   return combine(...formatters);

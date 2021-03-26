@@ -3,7 +3,7 @@
   "version": "6.0.0",
   "description": "A logging wrapper around winston and sentry.",
   "engines": {
-    "node": ">=4"
+    "node": ">=10"
   },
   "main": "index.js",
   "repository": {
