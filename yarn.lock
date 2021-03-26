@@ -1740,10 +1740,10 @@ node-environment-flags@1.0.4:
   dependencies:
     object.getownpropertydescriptors "^2.0.3"
 
-node-loggly-bulk@^2.2.4:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/node-loggly-bulk/-/node-loggly-bulk-2.2.5.tgz#6f41136f91b363d1b50612e8be0063859226967e"
-  integrity sha512-N6RjZfjqwhAYwT9nM8PFKXpWfaGFaDHnzwj2JBgsNq04xsEZNGMlI+rds90p5/TTkYAS8Ya6tbJChXFRqTSmiA==
+node-loggly-bulk@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/node-loggly-bulk/-/node-loggly-bulk-3.0.0.tgz#dfaa14086e0cbf87d26ed878e632c8589e224b39"
+  integrity sha512-b/LmWZUYNt/4oQsMcGx3fy4H4IxjFavh3tO0xkINfD6UKcz28rtrkUEGrwXeHvPh9O8d3Ub6kqZocP3WHoKkzg==
   dependencies:
     json-stringify-safe "5.0.x"
     moment "^2.18.1"
@@ -2630,13 +2630,13 @@ wide-align@1.1.3:
   dependencies:
     string-width "^1.0.2 || 2"
 
-winston-loggly-bulk@3.2:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/winston-loggly-bulk/-/winston-loggly-bulk-3.2.0.tgz#8e0bca551e7a88e8219f870c978ee6902144d38f"
-  integrity sha512-WTLaba1hHxeIW4To9PDFOlJXlxO63FgAckHIPx0Lu3zE33hCcRp0BZOEvovV8D6XjxzJlakpZ16ZLYncMhpEVQ==
+winston-loggly-bulk@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/winston-loggly-bulk/-/winston-loggly-bulk-3.2.1.tgz#e450863f775e00bf6c34bc7b9bf95f30644118dc"
+  integrity sha512-Ws4csTUuU3O8sepxzIj6VwacTlgyUWroVoNkIU0qcsEweW8lbheNUodKFi20lSiKzXKL9uF2J1hoVFyurD/M3w==
   dependencies:
     lodash.clonedeep "^4.5.0"
-    node-loggly-bulk "^2.2.4"
+    node-loggly-bulk "^3.0.0"
     winston "^3.3.3"
     winston-transport "^4.4.0"
 
