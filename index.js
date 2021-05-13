@@ -90,7 +90,7 @@ function Log(options) {
   } else {
     logTransports = options.transports.map(function(t) {
       var cls = Object.keys(t)[0];
-      var opts = t[cls];
+      var opts = Object.assign({},t[cls]);
       var Transport = winston.transports[cls];
       if(Transport == winston.transports.Console){
         var format = setupConsoleFormatters(opts);
