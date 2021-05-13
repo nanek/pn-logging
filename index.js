@@ -5,11 +5,13 @@
 var util = require('util');
 var winston = require('winston');
 var winex = require('./winex');
+const { format } = require('logform'); //depdency of wintson, ensure we are using the same version as winston
+const { combine, json, prettyPrint } = format;
 
 var sysLogLevels;
 
-// Exposes `winston.transports.Loggly`.
-require('winston-loggly');
+require('winston-loggly-bulk');
+
 
 sysLogLevels = {
   levels: {
@@ -23,6 +25,26 @@ sysLogLevels = {
     debug: 7,
   },
 };
+
+/**
+ * setups up formatters for winston 3 format (https://github.com/winstonjs/winston#formats)
+ * @param {*} formatter options 
+ * @returns 
+ */
+function setupConsoleFormatters(options) {
+  var formatters = [];
+
+  if(options.json){
+    formatters.push(json());
+  }
+
+  if(options.prettyPrint || options.stringify == null){
+    const colorize = options.colorize == true ? true : false;
+    formatters.push(prettyPrint({colorize}))
+  }
+
+  return combine(...formatters);
+}
 
 /**
  * Create a log object for public consumption.
@@ -70,6 +92,10 @@ function Log(options) {
       var cls = Object.keys(t)[0];
       var opts = t[cls];
       var Transport = winston.transports[cls];
+      if(Transport == winston.transports.Console){
+        var format = setupConsoleFormatters(opts);
+        opts.format = format;
+      }
       return new Transport(opts);
     });
   }
@@ -82,7 +108,7 @@ function Log(options) {
   if (options.meta)
     this.defaultMeta = options.meta
 
-  winstonLog = new winston.Logger(winstonOpts);
+  winstonLog = winston.createLogger(winstonOpts);
   this._winexConstructor = winex.factory(winstonLog, options.meta);
 
   /*
@@ -120,7 +146,7 @@ function _logger(level) {
     }
     var log = new this._winexConstructor({meta: this.defaultMeta});
 
-    if (util.isError(meta)) {
+    if (util.types.isNativeError(meta)) {
       error = meta;
       meta = null;
     }
