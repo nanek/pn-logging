@@ -1,7 +1,12 @@
 language: node_js
 node_js:
   - "8.14.0"
+cache:
+  # Yarn 2 caches to the local .yarn directory, not the Travis default `$HOME/.yarn`
+  directories:
+    - ./.yarn/cache
 branches:
   only:
     - master
 script: "npm run check"
+install: yarn install --immutable

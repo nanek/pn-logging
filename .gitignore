@@ -1,3 +1,12 @@
 /node_modules
 *.log
 /coverage
+
+# Yarn 2 Artifacts
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
