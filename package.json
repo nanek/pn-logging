@@ -16,7 +16,6 @@
   },
   "homepage": "https://github.com/spanishdict/pn-logging",
   "dependencies": {
-    "deep-extend": "0.2.2",
     "winston": "3.3.3",
     "winston-loggly-bulk": "3.2.1"
   },
