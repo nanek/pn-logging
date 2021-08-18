@@ -16,13 +16,12 @@
   },
   "homepage": "https://github.com/spanishdict/pn-logging",
   "dependencies": {
-    "deep-extend": "0.2.2",
     "winston": "3.3.3",
     "winston-loggly-bulk": "3.2.1"
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "eslint": "5.16.0",
+    "eslint": "7.10.0",
     "istanbul": "0.4.5",
     "mocha": "6.0.2",
     "sinon": "1.17.2"
