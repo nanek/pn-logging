@@ -146,6 +146,15 @@ describe('index', function() {
         ],
       });
     });
+    
+    it('should default transport to console when none are provided', function(){
+      sandbox.restore();
+      let stub = sandbox.stub(console, 'error');
+      log = new index.Log({transports: []});
+      log.debug('i should not throw an error');
+
+      sinon.assert.neverCalledWith(stub);
+    });
 
     it('should log a message', function() {
       log.debug('say what?');

@@ -87,7 +87,14 @@ function Log(options) {
 
   if (options.rawTransports){
     logTransports = options.transports
-  } else {
+  }
+  else if(options.transports.length == 0){
+    //defaults to console if no transports are given
+    logTransports = new winston.transports.Console({
+        format: winston.format.simple()
+      });
+  }
+  else {
     logTransports = options.transports.map(function(t) {
       var cls = Object.keys(t)[0];
       var opts = Object.assign({},t[cls]);
