@@ -91,7 +91,7 @@ function Log(options) {
   else if(options.transports.length == 0){
     //defaults to console if no transports are given
     logTransports = new winston.transports.Console({
-        format: winston.format.simple()
+        format: winston.format.json()
       });
   }
   else {
