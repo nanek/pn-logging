@@ -11,7 +11,7 @@ import Transport from 'winston-transport';
  * @param {string}   opts.level Log level
  * @param {function} opts.__log Callback to run when logging
  */
-function TestTransport(opts) {
+function TestTransport(this: any, opts: any) {
   this.name = 'test';
   this.level = opts.level;
   this.__log = opts.__log;
@@ -19,7 +19,7 @@ function TestTransport(opts) {
 
 util.inherits(TestTransport, Transport);
 
-TestTransport.prototype.log = function (level, msg, meta, callback) {
+TestTransport.prototype.log = function (level: any, msg: any, meta: any, callback: any) {
   this.__log(level, msg, meta);
   callback(null, true);
 };

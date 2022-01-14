@@ -1,17 +1,14 @@
-/*eslint no-process-env:0 no-param-reassign:0*/
+"use strict";
 
-'use strict';
-
-import util from 'util';
-import winston from 'winston';
-import winex from './winex';
-import { format } from 'logform'; //depdency of wintson, ensure we are using the same version as winston
+import util from "util";
+import winston from "winston";
+import winex from "./winex";
+import { format } from "logform"; //depdency of wintson, ensure we are using the same version as winston
 const { combine, json, prettyPrint } = format;
 
-var sysLogLevels;
+var sysLogLevels: any;
 
-import 'winston-loggly-bulk';
-
+import "winston-loggly-bulk";
 
 sysLogLevels = {
   levels: {
@@ -28,19 +25,19 @@ sysLogLevels = {
 
 /**
  * setups up formatters for winston 3 format (https://github.com/winstonjs/winston#formats)
- * @param {*} formatter options 
- * @returns 
+ * @param {*} formatter options
+ * @returns
  */
-function setupConsoleFormatters(options) {
+function setupConsoleFormatters(options: any) {
   var formatters = [];
 
-  if(options.json){
+  if (options.json) {
     formatters.push(json());
   }
 
-  if(options.prettyPrint || options.stringify == null){
+  if (options.prettyPrint || options.stringify == null) {
     const colorize = options.colorize == true ? true : false;
-    formatters.push(prettyPrint({colorize}))
+    formatters.push(prettyPrint({ colorize }));
   }
 
   return combine(...formatters);
@@ -76,30 +73,29 @@ function setupConsoleFormatters(options) {
  *
  * @return {void}
  */
-function Log(options) {
+function Log(this: any, options: any) {
   var logTransports;
   var winstonOpts;
   var winstonLog;
 
   if (!options || !options.transports) {
-    throw new Error('No transports found');
+    throw new Error("No transports found");
   }
 
-  if (options.rawTransports){
-    logTransports = options.transports
-  }
-  else if(options.transports.length == 0){
+  if (options.rawTransports) {
+    logTransports = options.transports;
+  } else if (options.transports.length == 0) {
     //defaults to console if no transports are given
     logTransports = new winston.transports.Console({
-        format: winston.format.json()
-      });
-  }
-  else {
-    logTransports = options.transports.map(function(t) {
+      format: winston.format.json(),
+    });
+  } else {
+    logTransports = options.transports.map(function (t: any) {
       var cls = Object.keys(t)[0];
-      var opts = Object.assign({},t[cls]);
+      var opts = Object.assign({}, t[cls]);
+      // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       var Transport = winston.transports[cls];
-      if(Transport == winston.transports.Console){
+      if (Transport == winston.transports.Console) {
         var format = setupConsoleFormatters(opts);
         opts.format = format;
       }
@@ -112,8 +108,7 @@ function Log(options) {
     transports: logTransports,
   };
 
-  if (options.meta)
-    this.defaultMeta = options.meta
+  if (options.meta) this.defaultMeta = options.meta;
 
   winstonLog = winston.createLogger(winstonOpts);
   this._winexConstructor = winex.factory(winstonLog, options.meta);
@@ -131,8 +126,8 @@ function Log(options) {
 }
 
 // https://github.com/jonschlinkert/isobject/blob/master/index.js
-function isObject(val) {
-  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+function isObject(val: any) {
+  return val != null && typeof val === "object" && Array.isArray(val) === false;
 }
 
 /**
@@ -142,8 +137,15 @@ function isObject(val) {
  *
  * @return {Function} Logging method to attach to the Log prototype.
  */
-function _logger(level) {
-  return function(message, meta, error, req, res) {
+function _logger(level: any) {
+  return function (
+    this: any,
+    message: any,
+    meta: any,
+    error: any,
+    req: any,
+    res: any
+  ) {
     if (isObject(message)) {
       meta = meta ? Object.assign(meta, message.meta) : message.meta;
       error = error ? error : message.error;
@@ -151,7 +153,7 @@ function _logger(level) {
       res = res ? res : message.res;
       message = message.message || message.msg;
     }
-    var log = new this._winexConstructor({meta: this.defaultMeta});
+    var log = new this._winexConstructor({ meta: this.defaultMeta });
 
     if (util.types.isNativeError(meta)) {
       error = meta;
@@ -162,11 +164,9 @@ function _logger(level) {
       log.addMeta(meta);
     }
 
-    if (req)
-      log.addReq(req)
+    if (req) log.addReq(req);
 
-    if (res)
-      log.addRes(res)
+    if (res) log.addRes(res);
 
     if (error) {
       log.addError(error);
@@ -176,7 +176,7 @@ function _logger(level) {
   };
 }
 
-Object.keys(sysLogLevels.levels).forEach(function(level) {
+Object.keys(sysLogLevels.levels).forEach(function (level) {
   Log.prototype[level] = _logger(level);
 });
 
