@@ -2,15 +2,15 @@
 
 'use strict';
 
-var util = require('util');
-var winston = require('winston');
-var winex = require('./winex');
-const { format } = require('logform'); //depdency of wintson, ensure we are using the same version as winston
+import util from 'util';
+import winston from 'winston';
+import winex from './winex';
+import { format } from 'logform'; //depdency of wintson, ensure we are using the same version as winston
 const { combine, json, prettyPrint } = format;
 
 var sysLogLevels;
 
-require('winston-loggly-bulk');
+import 'winston-loggly-bulk';
 
 
 sysLogLevels = {
@@ -180,6 +180,6 @@ Object.keys(sysLogLevels.levels).forEach(function(level) {
   Log.prototype[level] = _logger(level);
 });
 
-module.exports = {
+export default {
   Log: Log,
 };

@@ -1,7 +1,7 @@
 'use strict';
 
-var util = require('util');
-var Transport = require('winston-transport');
+import util from 'util';
+import Transport from 'winston-transport';
 
 /**
  * Transporter
@@ -24,4 +24,4 @@ TestTransport.prototype.log = function (level, msg, meta, callback) {
   callback(null, true);
 };
 
-module.exports = TestTransport;
+export default TestTransport;

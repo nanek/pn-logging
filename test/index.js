@@ -2,11 +2,11 @@
 
 'use strict';
 
-var expect = require('chai').expect;
-var sinon = require('sinon');
-var winston = require('winston');
-var TestTransport = require('./mock/test-transport');
-var index = require('../index');
+import { expect } from 'chai';
+import sinon from 'sinon';
+import winston from 'winston';
+import TestTransport from './mock/test-transport';
+import index from '../index';
 
 describe('index', function() {
   var sandbox;
