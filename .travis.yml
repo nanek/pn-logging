@@ -8,5 +8,5 @@ cache:
 branches:
   only:
     - master
-script: "npm run check"
+script: "npm run check && tsc"
 install: yarn install --immutable

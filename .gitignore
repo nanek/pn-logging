@@ -1,6 +1,7 @@
 /node_modules
 *.log
 /coverage
+/lib
 
 # Yarn 2 Artifacts
 .yarn/*
