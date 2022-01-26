@@ -125,6 +125,43 @@ describe('index', function() {
       const metaArgs = spy.firstCall.args[2];
       expect(metaArgs.type).to.equal('server');
     });
+
+    it('should not accumulate meta fields', function() {
+      log = new index.Log({
+        transports: [
+          {
+            TestTransport: {
+              level: 'debug',
+              __log: spy,
+            },
+          },
+        ],
+        meta: {
+          key1: 'value1',
+        },
+      });
+
+      log.info('msg', { key2: 'value2' });
+
+      sinon.assert.calledOnce(spy);
+
+      const firstArg = spy.firstCall.args[0];
+      expect(firstArg).to.equal('info');
+
+      const secondArg = spy.firstCall.args[1];
+      expect(secondArg).to.equal('msg');
+
+      let metaArgs = spy.firstCall.args[2];
+      expect(metaArgs.key1).to.equal('value1');
+      expect(metaArgs.key2).to.equal('value2');
+
+      log.info('msg', { key3: 'value3' });
+
+      metaArgs = spy.secondCall.args[2];
+      expect(metaArgs.key1).to.equal('value1');
+      expect(metaArgs.key3).to.equal('value3');
+      expect(metaArgs).not.to.have.property('key2')
+    });
   });
 
   describe('log methods', function() {
@@ -146,7 +183,7 @@ describe('index', function() {
         ],
       });
     });
-    
+
     it('should default transport to console when none are provided', function(){
       sandbox.restore();
       let stub = sandbox.stub(console, 'error');

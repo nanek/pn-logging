@@ -153,7 +153,7 @@ factory = function(winstonLogger, classMeta, opts) {
         opts = {};
       }
       this.baseMeta = bind(this.baseMeta, this);
-      this.meta = opts.meta || {};
+      this.meta = Object.assign({}, opts.meta || {});
       this.type = (ref1 = opts.type) != null ? ref1 : null;
       this.errNoStack = opts.errNoStack === true;
       this.info404 = opts.info404 === true;
