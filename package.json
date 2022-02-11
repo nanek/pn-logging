@@ -28,6 +28,10 @@
     "mocha": "6.0.2",
     "sinon": "1.17.2"
   },
+  "resolutions": {
+    "winston": "3.3.3",
+    "winston-transport": "4.4.0"
+  },
   "scripts": {
     "style": "eslint index.js test",
     "test": "env NODE_ENV=test istanbul cover node_modules/.bin/_mocha -- --recursive test",
