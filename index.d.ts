@@ -12,7 +12,7 @@ declare module "pn-logging" {
   type LoggingParameters = Parameters<
     (
       message: string,
-      meta: object,
+      meta?: object,
       err?: unknown,
       req?: Express.Request,
       res?: Express.Request
@@ -33,5 +33,6 @@ declare module "pn-logging" {
     notice(...args: LoggingParameters): void;
     info(...args: LoggingParameters): void;
     debug(...args: LoggingParameters): void;
+    middleware(): (req: any, res: any, next: any) => any;
   }
 }
