@@ -6,6 +6,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var winston = require('winston');
 var TestTransport = require('./mock/test-transport');
+var BadConnectionTransport = require('./mock/bad-connection-transport');
 var index = require('../index');
 
 describe('index', function() {
@@ -161,6 +162,33 @@ describe('index', function() {
       expect(metaArgs.key1).to.equal('value1');
       expect(metaArgs.key3).to.equal('value3');
       expect(metaArgs).not.to.have.property('key2')
+    });
+  });
+
+  describe('bad connection', function() {
+    var log;
+
+    beforeEach(function() {
+      sandbox.stub(winston, 'transports', { BadConnectionTransport: BadConnectionTransport });
+
+      log = new index.Log({
+        transports: [
+          {
+            BadConnectionTransport: {
+              level: 'debug',
+            },
+          },
+        ],
+      });
+    });
+
+    it('should not throw an error, but instead console.error', function() {
+      let stub = sandbox.stub(console, 'error');
+
+      log.debug('say what?');
+
+      sinon.assert.calledOnce(stub);
+      sinon.assert.calledWith(stub, 'pn-logging', 'connection failed');
     });
   });
 

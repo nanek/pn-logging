@@ -28,8 +28,8 @@ sysLogLevels = {
 
 /**
  * setups up formatters for winston 3 format (https://github.com/winstonjs/winston#formats)
- * @param {*} formatter options 
- * @returns 
+ * @param {*} formatter options
+ * @returns
  */
 function setupConsoleFormatters(options) {
   var formatters = [];
@@ -172,7 +172,11 @@ function _logger(level) {
       log.addError(error);
     }
 
-    log[level](message);
+    try {
+      log[level](message);
+    } catch (error) {
+      console.error("pn-logging", error.message);
+    }
   };
 }
 
