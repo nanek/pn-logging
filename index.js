@@ -28,8 +28,8 @@ sysLogLevels = {
 
 /**
  * setups up formatters for winston 3 format (https://github.com/winstonjs/winston#formats)
- * @param {*} formatter options 
- * @returns 
+ * @param {*} formatter options
+ * @returns
  */
 function setupConsoleFormatters(options) {
   var formatters = [];
@@ -126,6 +126,7 @@ function Log(options) {
     @meta       {Object} descriptive fields to attach to log
     @errNoStack {boolean} When true, don't include stack when logging errors.
     @info404    {boolean} When true, log 404s as info instead of warning.
+    @info401    {boolean} When true, log 401s as info instead of warning.
   */
   this.middleware = this._winexConstructor.middleware;
 }

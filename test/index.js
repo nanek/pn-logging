@@ -538,6 +538,62 @@ describe('index', function() {
       });
     });
 
+    it('should patch res.end and emit a warning log instance for a 401 response', function(done) {
+      var log = new index.Log({ transports: [] });
+      var middleware = log.middleware();
+
+      var req = makeReq();
+      var res = makeRes({ statusCode: 401 });
+
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.calledOnce(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '401',
+        });
+        done();
+      });
+    });
+
+    it('should patch res.end and emit an info log instance for a 401 response with info401 option', function(done) {
+      var log = new index.Log({ transports: [] });
+      var middleware = log.middleware({ info401: true });
+
+      var req = makeReq();
+      var res = makeRes({ statusCode: 401 });
+
+      middleware(req, res, err => {
+        expect(err).to.be.undefined;
+        expect(res.end).to.be.a('function');
+        expect(res.locals._log).to.be.ok;
+        expect(res.locals._log.info).to.be.a('function');
+        const infoStub = sinon.stub(res.locals._log, 'info');
+        const warningStub = sinon.stub(res.locals._log, 'warning');
+        res.end();
+        sinon.assert.calledOnce(infoStub);
+        sinon.assert.notCalled(warningStub);
+        const logObj = res.locals._log;
+        expect(logObj).to.have.property('meta');
+        expect(logObj.meta).to.eql({
+          reqPath: '/path',
+          reqQuery: '',
+          reqQueryChars: 0,
+          resStatus: '401',
+        });
+        done();
+      });
+    });
+
     it('should patch res.end and emit an error log instance for a 500 response', function(done) {
       var log = new index.Log({ transports: [] });
       var middleware = log.middleware();

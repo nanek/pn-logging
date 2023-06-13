@@ -157,6 +157,7 @@ factory = function(winstonLogger, classMeta, opts) {
       this.type = (ref1 = opts.type) != null ? ref1 : null;
       this.errNoStack = opts.errNoStack === true;
       this.info404 = opts.info404 === true;
+      this.info401 = opts.info401 === true;
       if (opts.req) {
         this.addReq(opts.req);
       }
@@ -189,8 +190,12 @@ factory = function(winstonLogger, classMeta, opts) {
           }
           level = "info";
           if ((400 <= (ref = res.statusCode) && ref < 500)) {
-            if (!(res.statusCode === 404 && log.info404)) {
-              level = "warning";
+            level = "warning";
+            if (res.statusCode === 404 && log.info404) {
+              level = "info";
+            }
+            if (res.statusCode === 401 && log.info401) {
+              level = "info";
             }
           }
           if (res.statusCode >= 500) {
